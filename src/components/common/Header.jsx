@@ -5,7 +5,7 @@ import { UserCircle } from "lucide-react";
 
 const Header = ({ currentPage, loggedInUserName }) => {
   return (
-    <div className="absolute right-0 top-0 w-4/5 h-[10vh] border-l bg-white shadow-md p-6 flex items-center justify-between">
+    <div className="absolute right-0 top-0 w-4/5 h-[75px] border-l bg-white shadow-md p-6 flex items-center justify-between">
       {/* Tiêu đề trang */}
       <h2 className="text-2xl font-bold text-gray-800">{currentPage}</h2>
 

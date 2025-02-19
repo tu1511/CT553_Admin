@@ -1,22 +1,24 @@
 import { useDispatch, useSelector } from "react-redux";
-// import { getProducts, deleteProduct } from "../../redux/thunk/productThunk";
 import { useEffect, useState } from "react";
 import { Button, Table, Modal } from "antd";
 import { Trash2, Edit, Plus } from "lucide-react";
 import { toast } from "react-toastify";
 import ActionHeader from "@components/common/ActionHeader";
 import ProductPopup from "@components/Popup/ProductPopup";
+import { getProducts } from "@redux/thunk/productThunk";
 
 const ProductPage = () => {
-  //   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const { products, loading } = useSelector((state) => state.product);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  //   useEffect(() => {
-  //     dispatch(getProducts());
-  //   }, [dispatch]);
+  useEffect(() => {
+    dispatch(getProducts({}));
+  }, [dispatch]);
+
+  console.log("products", products);
 
   const handleSelected = (selectedRowKeys, selectedRows) => {
     setSelectedRows(selectedRows);
@@ -60,11 +62,7 @@ const ProductPage = () => {
       align: "center",
       render: (text) => (
         <img
-          src={
-            text.startsWith("http")
-              ? text
-              : `http://localhost:5000/${text.replace(/\\/g, "/")}`
-          }
+          src={text}
           alt="Product"
           style={{
             width: 50,
@@ -77,8 +75,8 @@ const ProductPage = () => {
     },
     {
       title: "Tên sản phẩm",
-      dataIndex: "productName",
-      key: "productName",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "Danh mục",
@@ -94,18 +92,19 @@ const ProductPage = () => {
     },
     {
       title: "Số lượng",
-      dataIndex: "countInStock",
-      key: "countInStock",
+      dataIndex: "quantity",
+      key: "quantity",
       align: "center",
     },
   ];
 
-  const dataSource = products.map((product) => ({
+  const dataSource = products?.products?.map((product) => ({
     ...product,
-    key: product._id,
-    categoryName:
-      product.categoryDetails?.categoryName || product.category?.categoryName,
-    productImage: product.productImagePath[0],
+    key: product.id,
+    categoryName: product?.categories?.[0]?.category?.name || "Chưa phân loại",
+    productImage: product?.images[0]?.image?.path,
+    price: product?.variants[0]?.price,
+    quantity: product?.variants[0]?.quantity,
   }));
 
   return (
@@ -131,11 +130,11 @@ const ProductPage = () => {
         columns={columns}
         pagination={{ pageSize: 5 }}
       />
-      <ProductPopup
+      {/* <ProductPopup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         data={selectedRows}
-      />
+      /> */}
       <Modal
         title="Xác nhận xóa"
         open={isDeleteModalOpen}

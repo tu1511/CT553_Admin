@@ -17,7 +17,7 @@ const SideBar = () => {
   return (
     <div className="absolute left-0 top-0 flex h-screen w-1/5 flex-col bg-slate-200 shadow-lg">
       {/* Logo */}
-      <div className="flex items-center justify-center h-[75px] w-full border-b-2 border-slate-300">
+      <div className="flex items-center justify-center h-[75px] border-l bg-white shadow-md  w-full border-slate-300">
         <Logo className="h-[50]" />
       </div>
 

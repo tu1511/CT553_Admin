@@ -77,7 +77,7 @@ const MainLayout = ({ children }) => {
       <SideBar />
       <div>
         <Header currentPage={currentPageName} loggedInUserName="Minh tu" />
-        <div className="no-scrollbar absolute bottom-0 right-0 h-6/7 w-4/5 overflow-auto p-4 pb-0">
+        <div className="no-scrollbar absolute top-20 right-0 h-6/7 w-4/5 overflow-auto p-4 pb-0">
           {children}
           {/* <PrivateRoute>{children}</PrivateRoute> */}
         </div>
