@@ -9,7 +9,7 @@ import SideBar from "@components/common/SideBar";
 // import { getLoggedInUser } from "../redux/thunk/userThunk";
 // import PrivateRoute from "../configs/PrivateRoute";
 
-const CommonLayout = ({ children }) => {
+const MainLayout = ({ children }) => {
   // const dispatch = useDispatch();
   // const userExist = useSelector((state) => state.users?.user);
 
@@ -28,6 +28,8 @@ const CommonLayout = ({ children }) => {
 
   const currentPath = useLocation().pathname;
   const pages = useRoutes();
+
+  // console.log(pages);
 
   const findLabelInChildren = (childItems, currentPath) => {
     for (const child of childItems) {
@@ -84,8 +86,8 @@ const CommonLayout = ({ children }) => {
   );
 };
 
-CommonLayout.propTypes = {
+MainLayout.propTypes = {
   children: PropTypes.node,
 };
 
-export default CommonLayout;
+export default MainLayout;

@@ -23,8 +23,8 @@ const Logo = ({ ...props }) => {
         className="flex w-full items-center justify-between px-6 pt-2"
       >
         <img
-          className="w-1/6 rounded-full"
-          src="https://images.pexels.com/photos/30719145/pexels-photo-30719145.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+          className="w-1/5 rounded-full"
+          src="/src/assets/logo.png"
           alt="logo Silver Charm"
         />
         <h1 className="text-xl font-bold uppercase">Silver Charm</h1>
