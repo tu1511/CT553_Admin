@@ -1,6 +1,19 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import accountService from "@services/account.service";
 
+// thunk for getting all account
+export const getAllAccount = createAsyncThunk(
+  "account/getAllAccount",
+  async ({ limit = 10, page = -1 }, { rejectWithValue }) => {
+    try {
+      const response = await accountService.getAllAccount(limit, page);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
 export const getLoggedInUser = createAsyncThunk(
   "account/getLoggedInUser",
   async (accessToken, { rejectWithValue }) => {

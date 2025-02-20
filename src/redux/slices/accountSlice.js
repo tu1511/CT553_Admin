@@ -3,6 +3,7 @@ import {
   updateUserInfoThunk,
   getLoggedInUser,
   changePasswordThunk,
+  getAllAccount,
 } from "@redux/thunk/accountThunk";
 
 const accountSlice = createSlice({
@@ -15,6 +16,19 @@ const accountSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(getAllAccount.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(getAllAccount.fulfilled, (state, action) => {
+        state.loading = false;
+        state.account = action.payload.metadata;
+      })
+      .addCase(getAllAccount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       .addCase(getLoggedInUser.pending, (state) => {
         state.loading = true;
         state.error = "";

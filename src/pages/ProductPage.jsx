@@ -1,57 +1,41 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { Button, Table, Modal } from "antd";
-import { Trash2, Edit, Plus } from "lucide-react";
+import { Modal } from "antd";
 import { toast } from "react-toastify";
-import ActionHeader from "@components/common/ActionHeader";
-import ProductPopup from "@components/Popup/ProductPopup";
+import TableComponent from "@components/common/TableComponent";
 import { getProducts } from "@redux/thunk/productThunk";
 
 const ProductPage = () => {
   const dispatch = useDispatch();
   const { products, loading } = useSelector((state) => state.product);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+
+  console.log("editingProduct:", editingProduct);
 
   useEffect(() => {
     dispatch(getProducts({}));
   }, [dispatch]);
 
-  console.log("products", products);
-
-  const handleSelected = (selectedRowKeys, selectedRows) => {
-    setSelectedRows(selectedRows);
+  const handleSelected = (keys) => {
+    const selected = products?.products?.filter((product) =>
+      keys.includes(product.id)
+    );
+    setSelectedRowKeys(keys);
+    setSelectedRows(selected);
   };
 
-  const handleUpdate = () => {
-    if (selectedRows.length !== 1) {
-      toast.error("Vui lòng chọn 1 sản phẩm để cập nhật!");
-    } else {
-      setIsPopupOpen(true);
-    }
-  };
-
-  const handleDelete = () => {
-    if (selectedRows.length === 0) {
-      toast.error("Vui lòng chọn ít nhất một sản phẩm để xóa");
-      return;
-    }
-
-    setIsDeleteModalOpen(true);
+  const confirmUpdate = () => {
+    setIsUpdateModalOpen(false);
+    // setIsPopupOpen(true);
   };
 
   const confirmDelete = async () => {
-    // try {
-    //   await dispatch(
-    //     deleteProduct(selectedRows.map((row) => row._id))
-    //   ).unwrap();
-    //   toast.success("Xóa thành công!");
-    //   setSelectedRows([]);
-    // } catch (err) {
-    //   toast.error("Có lỗi xảy ra!");
-    // }
-    // setIsDeleteModalOpen(false);
+    setIsDeleteModalOpen(false);
+    toast.success("Xóa sản phẩm thành công!");
   };
 
   const columns = [
@@ -73,16 +57,8 @@ const ProductPage = () => {
         />
       ),
     },
-    {
-      title: "Tên sản phẩm",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Danh mục",
-      dataIndex: "categoryName",
-      key: "categoryName",
-    },
+    { title: "Tên sản phẩm", dataIndex: "name", key: "name" },
+    { title: "Danh mục", dataIndex: "categoryName", key: "categoryName" },
     {
       title: "Giá",
       dataIndex: "price",
@@ -98,7 +74,7 @@ const ProductPage = () => {
     },
   ];
 
-  const dataSource = products?.products?.map((product) => ({
+  const rows = products?.products?.map((product) => ({
     ...product,
     key: product.id,
     categoryName: product?.categories?.[0]?.category?.name || "Chưa phân loại",
@@ -109,41 +85,46 @@ const ProductPage = () => {
 
   return (
     <div>
-      <ActionHeader
-        title="Sản phẩm"
-        onAdd={() => {
-          setSelectedRows([]);
-          setIsPopupOpen(true);
-        }}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-        selectedRows={selectedRows.map((row) => row._id)}
-        icons={{ add: <Plus />, update: <Edit />, delete: <Trash2 /> }}
-      />
-      <Table
+      <TableComponent
         loading={loading}
-        rowSelection={{
-          type: "checkbox",
-          onChange: handleSelected,
+        onEdit={(record) => {
+          setEditingProduct(record);
+          console.log("Sửa sản phẩm:", record);
+          setIsUpdateModalOpen(true);
         }}
-        dataSource={dataSource}
+        onDelete={(record) => {
+          console.log("Sửa sản phẩm:", record);
+
+          setSelectedRowKeys([record.key]);
+          setIsDeleteModalOpen(true);
+        }}
+        checkbox={true}
+        rows={rows}
         columns={columns}
         pagination={{ pageSize: 5 }}
+        handleSelected={handleSelected}
       />
-      {/* <ProductPopup
-        isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)}
-        data={selectedRows}
-      /> */}
+      {/* Modal xác nhận xóa */}
       <Modal
         title="Xác nhận xóa"
         open={isDeleteModalOpen}
         onOk={confirmDelete}
         onCancel={() => setIsDeleteModalOpen(false)}
-        okText="Chắc chắn"
+        okText="Xóa"
         cancelText="Hủy"
       >
-        Bạn có chắc chắn muốn xóa những sản phẩm đã chọn không?
+        <p>Bạn có chắc chắn muốn xóa sản phẩm đã chọn không?</p>
+      </Modal>
+      {/* Modal xác nhận cập nhật */}
+      <Modal
+        title="Xác nhận cập nhật"
+        open={isUpdateModalOpen}
+        onCancel={() => setIsUpdateModalOpen(false)}
+        onOk={confirmUpdate}
+        okText="Tiếp tục"
+        cancelText="Hủy"
+      >
+        Bạn có chắc chắn muốn cập nhật sản phẩm đã chọn không?
       </Modal>
     </div>
   );

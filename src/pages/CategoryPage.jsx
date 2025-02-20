@@ -1,47 +1,39 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState, useMemo } from "react";
-import { Button, Modal, Table, message, Tooltip } from "antd";
+import { Modal, Tooltip } from "antd";
 import { getCategories } from "@redux/thunk/categoryThunk";
-import ActionHeader from "@components/common/ActionHeader";
 import CategoryPopup from "@components/Popup/CategoryPopup";
+import TableComponent from "@components/common/TableComponent";
 
 const CategoryPage = () => {
   const dispatch = useDispatch();
   const { categories, loading } = useSelector((state) => state.category);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(getCategories());
   }, [dispatch]);
 
-  const handleSelected = (selectedRowKeys, selectedRows) => {
-    setSelectedRows(selectedRows);
+  const handleSelected = (selectedRowKeys) => {
+    const selectedData = flatCategories.filter((row) =>
+      selectedRowKeys.includes(row.id)
+    );
+    setSelectedRows(selectedData);
   };
 
-  const handleUpdate = () => {
-    if (selectedRows.length !== 1) {
-      message.error("Vui lòng chọn 1 danh mục để cập nhật!");
-      return;
-    }
+  const confirmUpdate = () => {
+    setIsUpdateModalOpen(false);
     setIsPopupOpen(true);
   };
 
-  const handleDelete = () => {
-    if (selectedRows.length === 0) {
-      message.error("Vui lòng chọn ít nhất một danh mục để xóa");
-      return;
-    }
-    setIsModalOpen(true);
-  };
-
   const confirmDelete = async () => {
-    setIsModalOpen(false);
-    // TODO: Xử lý xóa danh mục (hiện tại đang bị comment)
+    setIsDeleteModalOpen(false);
+    // TODO: Xử lý xóa danh mục
   };
 
-  // Chuyển danh mục sang dạng danh sách phẳng
   const flatCategories = useMemo(() => {
     return categories.reduce((acc, category) => {
       acc.push({
@@ -138,41 +130,49 @@ const CategoryPage = () => {
 
   return (
     <div>
-      <ActionHeader
-        title="Danh mục"
-        onAdd={() => {
-          setSelectedRows([]);
-          setIsPopupOpen(true);
-        }}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-        selectedRows={selectedRows.map((row) => row.id)}
-      />
-
-      <Table
+      <TableComponent
         loading={loading}
-        rowSelection={{
-          type: "checkbox",
-          onChange: handleSelected,
-        }}
+        rows={flatCategories}
         columns={columns}
-        dataSource={flatCategories}
         pagination={{ pageSize: 5 }}
-        rowKey="id"
+        onEdit={(record) => {
+          console.log("Sửa danh mục:", record);
+          setSelectedRows([record]);
+          setIsUpdateModalOpen(true);
+        }}
+        onDelete={(record) => {
+          console.log("Xóa danh mục:", record);
+          setSelectedRows([record]);
+          setIsDeleteModalOpen(true);
+        }}
+        checkbox={false}
+        handleSelected={handleSelected}
       />
 
       {/* Popup Thêm / Cập nhật danh mục */}
-      {/* <CategoryPopup
+      <CategoryPopup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         data={selectedRows[0] || null}
-      /> */}
+      />
+
+      {/* Modal Xác nhận Cập nhật */}
+      <Modal
+        title="Xác nhận cập nhật"
+        open={isUpdateModalOpen}
+        onCancel={() => setIsUpdateModalOpen(false)}
+        onOk={confirmUpdate}
+        okText="Tiếp tục"
+        cancelText="Hủy"
+      >
+        Bạn có chắc chắn muốn cập nhật danh mục đã chọn không?
+      </Modal>
 
       {/* Modal Xác nhận Xóa */}
       <Modal
         title="Xác nhận xóa"
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        open={isDeleteModalOpen}
+        onCancel={() => setIsDeleteModalOpen(false)}
         onOk={confirmDelete}
         okText="Chắc chắn"
         cancelText="Hủy"

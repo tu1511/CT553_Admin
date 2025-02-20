@@ -5,6 +5,17 @@ class accountService {
     this.api = createApiClient(path);
   }
 
+  // get all account
+  async getAllAccount(limit, page) {
+    const response = await this.api.get("/", {
+      params: {
+        limit,
+        page,
+      },
+    });
+    return response.data;
+  }
+
   async getLoggedInUser(accessToken) {
     const response = await this.api.get("/logged-in-account", {
       headers: {
