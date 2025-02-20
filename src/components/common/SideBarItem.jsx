@@ -35,7 +35,7 @@ const SideBarItem = ({ icon, label, path, childItems, isToggled, onClick }) => {
               to={childPath}
               className={`block rounded-md p-3 ps-14 hover:cursor-pointer hover:bg-slate-300 ${
                 currentPath === childPath &&
-                "bg-[#e95221] font-semibold text-white hover:bg-[#e78212]"
+                "bg-primary font-semibold text-white hover:bg-primary"
               }`}
             >
               {label}

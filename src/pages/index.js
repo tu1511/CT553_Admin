@@ -5,6 +5,7 @@ import CategoryPage from "./CategoryPage";
 import NotFoundPage from "./NotFoundPage";
 // import LoginPage from "./LoginPage";
 import OrderPage from "./OrderPage";
+import AccountPage from "./AccountPage";
 
 export {
   HomePage,
@@ -14,4 +15,5 @@ export {
   NotFoundPage,
   //   LoginPage,
   OrderPage,
+  AccountPage,
 };
