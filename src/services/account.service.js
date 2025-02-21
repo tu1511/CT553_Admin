@@ -43,5 +43,15 @@ class accountService {
     });
     return response.data;
   }
+
+  // toggle account active
+  async toggleActive(id) {
+    const response = await this.api.put(`/toggleActive/${id}`, {
+      //headers: {
+      //   Authorization: `Bearer ${accessToken}`,
+      // },
+    });
+    return response.data;
+  }
 }
 export default new accountService();

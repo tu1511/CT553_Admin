@@ -15,10 +15,10 @@ const SideBar = () => {
   };
 
   return (
-    <div className="absolute left-0 top-0 flex h-screen w-1/5 flex-col bg-slate-200 shadow-lg">
+    <div className="fixed left-0 top-0 flex h-full w-1/5 flex-col bg-slate-200 shadow-lg">
       {/* Logo */}
-      <div className="flex items-center justify-center h-[75px] border-l bg-white shadow-md  w-full border-slate-300">
-        <Logo className="h-[50]" />
+      <div className="flex items-center justify-center h-[75px] border-b bg-white shadow-md w-full border-slate-300">
+        <Logo className="h-[50px]" />
       </div>
 
       {/* Sidebar Items */}
@@ -27,7 +27,7 @@ const SideBar = () => {
       </div>
 
       {/* Logout Button */}
-      <div className="w-full border-t-2 border-slate-300 p-4 bg-slate-200">
+      <div className="w-full border-t border-slate-300 p-4 bg-slate-200">
         <Button
           onClick={logout}
           className="w-full flex items-center justify-center gap-2 rounded-md py-2 text-red-600 hover:bg-red-50 transition"

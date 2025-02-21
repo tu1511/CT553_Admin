@@ -55,3 +55,15 @@ export const changePasswordThunk = createAsyncThunk(
     }
   }
 );
+
+export const toggleActiveAccount = createAsyncThunk(
+  "account/toggleActive",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await accountService.toggleActive(id);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Cập nhật thất bại");
+    }
+  }
+);

@@ -4,6 +4,7 @@ import {
   getLoggedInUser,
   changePasswordThunk,
   getAllAccount,
+  toggleActiveAccount,
 } from "@redux/thunk/accountThunk";
 
 const accountSlice = createSlice({
@@ -51,6 +52,17 @@ const accountSlice = createSlice({
       .addCase(changePasswordThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(toggleActiveAccount.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(toggleActiveAccount.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(toggleActiveAccount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.metadata;
       });
     builder.addCase(updateUserInfoThunk.pending, (state) => {
       state.loading = true;
