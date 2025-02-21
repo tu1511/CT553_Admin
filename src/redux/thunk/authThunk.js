@@ -8,7 +8,7 @@ export const loginThunk = createAsyncThunk(
       const response = (await authService.login(credentials)).data;
 
       const userRole = response?.metadata?.account?.role;
-      if (userRole !== "ADMIN") {
+      if (userRole === "USER") {
         return rejectWithValue("Bạn không có quyền truy cập vào hệ thống!");
       }
 

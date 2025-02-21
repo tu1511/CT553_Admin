@@ -27,7 +27,7 @@ const authSlice = createSlice({
       })
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.authUser = action.payload;
+        state.authUser = action.payload?.metadata;
       })
       .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false;

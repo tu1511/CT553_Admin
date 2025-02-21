@@ -1,4 +1,8 @@
-import { getCategories } from "@redux/thunk/categoryThunk";
+import {
+  createCategory,
+  getCategories,
+  updateCategory,
+} from "@redux/thunk/categoryThunk";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -33,23 +37,24 @@ const categorySlice = createSlice({
         setFulfilled(state);
         state.categories = action.payload?.metadata;
       })
-      .addCase(getCategories.rejected, setError);
+      .addCase(getCategories.rejected, setError)
 
-    //   .addCase(createCategory.pending, setLoading)
-    //   .addCase(createCategory.fulfilled, (state, action) => {
-    //     setFulfilled(state);
-    //     state.categories.push(action.payload);
-    //   })
-    //   .addCase(createCategory.rejected, setError)
-
-    //   .addCase(updateCategory.pending, setLoading)
-    //   .addCase(updateCategory.fulfilled, (state, action) => {
-    //     setFulfilled(state);
-    //     state.categories = state.categories.map((category) =>
-    //       category._id === action.payload._id ? action.payload : category
-    //     );
-    //   })
-    //   .addCase(updateCategory.rejected, setError)
+      .addCase(createCategory.pending, setLoading)
+      .addCase(createCategory.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.categories.push(action.payload?.metadata);
+      })
+      .addCase(createCategory.rejected, setError)
+      .addCase(updateCategory.pending, setLoading)
+      .addCase(updateCategory.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.categories = state.categories.map((category) =>
+          category._id === action.payload?.metadata._id
+            ? action.payload?.metadata
+            : category
+        );
+      })
+      .addCase(updateCategory.rejected, setError);
 
     //   .addCase(deleteCategory.pending, setLoading)
     //   .addCase(deleteCategory.fulfilled, (state, action) => {

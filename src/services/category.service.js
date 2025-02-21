@@ -26,6 +26,27 @@ class categoryService {
     });
     return response.data;
   }
+
+  // create category
+  async createCategory(data, accessToken) {
+    const response = await this.api.post("/", data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
+
+  // update category
+  async updateCategory(id, data, accessToken) {
+    const response = await this.api.put(`/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.data;
+  }
 }
 
 export default new categoryService();

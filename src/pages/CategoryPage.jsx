@@ -41,6 +41,8 @@ const CategoryPage = () => {
         _id: category.id,
         categoryName: category.name,
         categoryParent: category.parent ? category.parent.name : "Không có",
+        slug: category.slug,
+        idParent: category.parent ? category.parent.id : null,
         thumbnail: category.thumbnailImage
           ? category.thumbnailImage.path
           : null,
@@ -58,6 +60,8 @@ const CategoryPage = () => {
             id: acc.length + 1,
             _id: child.id,
             categoryName: child.name,
+            slug: child.slug,
+            idParent: category.id,
             categoryParent: category.name,
             thumbnail: child.thumbnailImage ? child.thumbnailImage.path : null,
             updatedAt: child.updatedAt
@@ -151,22 +155,10 @@ const CategoryPage = () => {
 
       {/* Popup Thêm / Cập nhật danh mục */}
       <CategoryPopup
-        isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)}
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
         data={selectedRows[0] || null}
       />
-
-      {/* Modal Xác nhận Cập nhật */}
-      <Modal
-        title="Xác nhận cập nhật"
-        open={isUpdateModalOpen}
-        onCancel={() => setIsUpdateModalOpen(false)}
-        onOk={confirmUpdate}
-        okText="Tiếp tục"
-        cancelText="Hủy"
-      >
-        Bạn có chắc chắn muốn cập nhật danh mục đã chọn không?
-      </Modal>
 
       {/* Modal Xác nhận Xóa */}
       <Modal
