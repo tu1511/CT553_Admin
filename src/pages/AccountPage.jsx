@@ -40,7 +40,7 @@ const AccountPage = () => {
     setIsDeleteModalOpen(false);
     toast.success("Xóa tài khoản thành công!");
   };
-
+  const accessToken = localStorage.getItem("accessToken");
   const confirmUpdate = async () => {
     console.log("Cập nhật tài khoản:", selectedAccount);
     setIsUpdateModalOpen(false);
@@ -52,7 +52,9 @@ const AccountPage = () => {
 
     try {
       // Gọi API cập nhật trạng thái
-      await dispatch(toggleActiveAccount({ id: selectedAccount.id }));
+      await dispatch(
+        toggleActiveAccount({ id: selectedAccount.id, accessToken })
+      );
 
       // Gọi lại API để lấy dữ liệu mới
       dispatch(getAllAccount({ limit: 10, page: -1 }));

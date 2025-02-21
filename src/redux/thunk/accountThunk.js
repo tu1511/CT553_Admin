@@ -58,9 +58,9 @@ export const changePasswordThunk = createAsyncThunk(
 
 export const toggleActiveAccount = createAsyncThunk(
   "account/toggleActive",
-  async ({ id }, { rejectWithValue }) => {
+  async ({ id, accessToken }, { rejectWithValue }) => {
     try {
-      const response = await accountService.toggleActive(id);
+      const response = await accountService.toggleActive(id, accessToken);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Cập nhật thất bại");

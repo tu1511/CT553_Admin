@@ -6,20 +6,22 @@ export const loginThunk = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = (await authService.login(credentials)).data;
+
+      const userRole = response?.metadata?.account?.role;
+      if (userRole !== "ADMIN") {
+        return rejectWithValue("Bạn không có quyền truy cập vào hệ thống!");
+      }
+
       // Lưu access token và refresh token vào localStorage
       localStorage.setItem(
         "accessToken",
-        response.metadata?.tokens?.accessToken
-      );
-
-      localStorage.setItem(
-        "refreshToken",
-        response.metadata?.tokens?.refreshToken
+        response?.metadata.tokens.accessToken
       );
 
       return response;
     } catch (error) {
-      return rejectWithValue(error.response.data.error);
+      console.log("Lỗi khi đăng nhập:", error.data.message);
+      return rejectWithValue(error.data.message);
     }
   }
 );

@@ -45,11 +45,11 @@ class accountService {
   }
 
   // toggle account active
-  async toggleActive(id) {
+  async toggleActive(id, accessToken) {
     const response = await this.api.put(`/toggleActive/${id}`, {
-      //headers: {
-      //   Authorization: `Bearer ${accessToken}`,
-      // },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
     return response.data;
   }

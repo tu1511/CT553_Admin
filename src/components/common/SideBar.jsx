@@ -10,7 +10,6 @@ const SideBar = () => {
 
   const logout = () => {
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
     navigate("/login");
   };
 

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography } from "antd";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { loginThunk } from "@redux/thunk/authThunk"; // Import your Redux thunk
+import { loginThunk } from "@redux/thunk/authThunk"; // Import Redux thunk
 
 const { Title, Text } = Typography;
 
@@ -16,18 +16,28 @@ const LoginPage = () => {
   const onSuccess = async (values) => {
     try {
       setLoading(true);
-      // Dispatch the login action
-      await dispatch(loginThunk(values));
+      const resultAction = await dispatch(loginThunk(values));
+
+      if (loginThunk.rejected.match(resultAction)) {
+        throw new Error(
+          resultAction.payload || "Bạn không có quyền truy cập vào hệ thống!"
+        );
+      }
 
       toast.success("Đăng nhập thành công!");
-
-      // Redirect to homepage or another route after successful login
       navigate("/");
     } catch (error) {
-      const message =
-        error.response?.data?.message === "Invalid credentials"
-          ? "Email hoặc mật khẩu không đúng!"
-          : "Đăng nhập không thành công!";
+      let message = "Đăng nhập không thành công!";
+
+      if (error.message === "Invalid credentials") {
+        message = "Email hoặc mật khẩu không đúng!";
+      } else if (error.message === "Account is blocked") {
+        message = "Tài khoản của bạn đã bị khóa!";
+      } else if (
+        error.message === "Bạn không có quyền truy cập vào hệ thống!"
+      ) {
+        message = "Bạn không có quyền truy cập vào hệ thống!";
+      }
       toast.error(message);
     } finally {
       setLoading(false);
