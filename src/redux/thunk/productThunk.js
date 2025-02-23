@@ -3,7 +3,7 @@ import productService from "@services/product.service";
 
 export const getProducts = createAsyncThunk(
   "products/getProducts",
-  async ({ limit = 25, type = "All" } = {}, { rejectWithValue }) => {
+  async ({ limit = 300, type = "All" } = {}, { rejectWithValue }) => {
     try {
       const response = await productService.getProducts({ limit, type });
 

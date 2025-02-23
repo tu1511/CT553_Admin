@@ -24,11 +24,6 @@ const CategoryPage = () => {
     setSelectedRows(selectedData);
   };
 
-  const confirmUpdate = () => {
-    setIsUpdateModalOpen(false);
-    setIsPopupOpen(true);
-  };
-
   const confirmDelete = async () => {
     setIsDeleteModalOpen(false);
     // TODO: Xử lý xóa danh mục
@@ -42,6 +37,7 @@ const CategoryPage = () => {
         categoryName: category.name,
         categoryParent: category.parent ? category.parent.name : "Không có",
         slug: category.slug,
+        thumbnailId: category.thumbnailImageId,
         idParent: category.parent ? category.parent.id : null,
         thumbnail: category.thumbnailImage
           ? category.thumbnailImage.path
@@ -63,6 +59,7 @@ const CategoryPage = () => {
             slug: child.slug,
             idParent: category.id,
             categoryParent: category.name,
+            thumbnailId: child.thumbnailImageId,
             thumbnail: child.thumbnailImage ? child.thumbnailImage.path : null,
             updatedAt: child.updatedAt
               ? new Date(child.updatedAt).toLocaleDateString("vi-VN")
@@ -77,6 +74,8 @@ const CategoryPage = () => {
       return acc;
     }, []);
   }, [categories]);
+
+  // console.log("Danh sách danh mục:", flatCategories);
 
   const columns = useMemo(
     () => [

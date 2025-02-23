@@ -4,6 +4,7 @@ import { Modal } from "antd";
 import { toast } from "react-toastify";
 import TableComponent from "@components/common/TableComponent";
 import { getProducts } from "@redux/thunk/productThunk";
+import PopupProduct from "@components/Popup/ProductPopup";
 
 const ProductPage = () => {
   const dispatch = useDispatch();
@@ -26,11 +27,6 @@ const ProductPage = () => {
     );
     setSelectedRowKeys(keys);
     setSelectedRows(selected);
-  };
-
-  const confirmUpdate = () => {
-    setIsUpdateModalOpen(false);
-    // setIsPopupOpen(true);
   };
 
   const confirmDelete = async () => {
@@ -98,7 +94,7 @@ const ProductPage = () => {
           setSelectedRowKeys([record.key]);
           setIsDeleteModalOpen(true);
         }}
-        checkbox={true}
+        checkbox={false}
         rows={rows}
         columns={columns}
         pagination={{ pageSize: 5 }}
@@ -116,16 +112,14 @@ const ProductPage = () => {
         <p>Bạn có chắc chắn muốn xóa sản phẩm đã chọn không?</p>
       </Modal>
       {/* Modal xác nhận cập nhật */}
-      <Modal
-        title="Xác nhận cập nhật"
-        open={isUpdateModalOpen}
-        onCancel={() => setIsUpdateModalOpen(false)}
-        onOk={confirmUpdate}
-        okText="Tiếp tục"
-        cancelText="Hủy"
-      >
-        Bạn có chắc chắn muốn cập nhật sản phẩm đã chọn không?
-      </Modal>
+
+      <PopupProduct
+        isOpen={isUpdateModalOpen}
+        onClose={() => {
+          setIsUpdateModalOpen(false);
+        }}
+        product={editingProduct}
+      />
     </div>
   );
 };

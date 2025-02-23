@@ -24,14 +24,11 @@ const CategoryPopup = ({ isOpen, onClose, data }) => {
       form.setFieldsValue({
         name: data.categoryName,
         slug: data.slug || "",
-        parentId:
-          data.categoryParent !== "Không có" ? data.idParent : "Không có",
+        parentId: data.idParent,
       });
 
       setFileList(
-        data.thumbnail
-          ? [{ uid: "-1", name: "Ảnh hiện tại", url: data?.thumbnail }]
-          : []
+        data.thumbnail ? [{ uid: data?.thumbnailId, url: data?.thumbnail }] : []
       );
     } else {
       form.resetFields();
@@ -51,7 +48,6 @@ const CategoryPopup = ({ isOpen, onClose, data }) => {
         setFileList([
           {
             uid: uploadedImage.id,
-            name: uploadedImage.filename,
             url: uploadedImage.path,
           },
         ]);
@@ -73,9 +69,10 @@ const CategoryPopup = ({ isOpen, onClose, data }) => {
         name: values.name,
         slug: values.slug,
         thumbnailImageId: fileList.length ? fileList[0].uid : "",
-        ...(values.parentId &&
-          values.parentId !== "Không có" && { parentId: values.parentId }),
+        parentId: values.parentId ? values.parentId : null,
       };
+
+      console.log("Form data:", formData);
 
       if (data) {
         await dispatch(
@@ -121,8 +118,11 @@ const CategoryPopup = ({ isOpen, onClose, data }) => {
 
         <Form.Item label="Danh mục cha" name="parentId">
           <Select allowClear placeholder="Chọn danh mục cha">
-            {categories.map(({ _id, name }) => (
-              <Option key={_id} value={_id}>
+            <Option key="none" value={null}>
+              Không có
+            </Option>
+            {categories.map(({ id, name }) => (
+              <Option key={id} value={id}>
                 {name}
               </Option>
             ))}
