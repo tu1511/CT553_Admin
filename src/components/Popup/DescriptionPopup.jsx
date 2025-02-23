@@ -7,6 +7,7 @@ const DescriptionPopup = ({ isOpen, onClose, description, onSave }) => {
 
   const handleSave = () => {
     const updatedDescription = editorRef.current?.value;
+    // console.log("updatedDescription", updatedDescription);
     onSave(updatedDescription);
     onClose();
   };

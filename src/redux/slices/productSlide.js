@@ -1,4 +1,4 @@
-import { getProducts } from "@redux/thunk/productThunk";
+import { createProduct, getProducts } from "@redux/thunk/productThunk";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -33,21 +33,23 @@ const productSlice = createSlice({
         setFulfilled(state);
         state.products = action.payload?.metadata;
       })
-      .addCase(getProducts.rejected, setError);
+      .addCase(getProducts.rejected, setError)
 
-    //   .addCase(getProductById.pending, setLoading)
-    //   .addCase(getProductById.fulfilled, (state, action) => {
-    //     setFulfilled(state);
-    //     state.product = action.payload;
-    //   })
-    //   .addCase(getProductById.rejected, setError)
+      //   .addCase(getProductById.pending, setLoading)
+      //   .addCase(getProductById.fulfilled, (state, action) => {
+      //     setFulfilled(state);
+      //     state.product = action.payload;
+      //   })
+      //   .addCase(getProductById.rejected, setError)
 
-    //   .addCase(createProduct.pending, setLoading)
-    //   .addCase(createProduct.fulfilled, (state, action) => {
-    //     setFulfilled(state);
-    //     state.products.unshift(action.payload);
-    //   })
-    //   .addCase(createProduct.rejected, setError)
+      .addCase(createProduct.pending, setLoading)
+      .addCase(createProduct.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.products = Array.isArray(action.payload?.metadata)
+          ? action.payload.metadata
+          : [];
+      })
+      .addCase(createProduct.rejected, setError);
 
     //   .addCase(updateProduct.pending, setLoading)
     //   .addCase(updateProduct.fulfilled, (state, action) => {

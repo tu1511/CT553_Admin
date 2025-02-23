@@ -1,10 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { Modal } from "antd";
+import { Button, Modal } from "antd";
 import { toast } from "react-toastify";
 import TableComponent from "@components/common/TableComponent";
 import { getProducts } from "@redux/thunk/productThunk";
 import PopupProduct from "@components/Popup/ProductPopup";
+import { Plus } from "lucide-react";
 
 const ProductPage = () => {
   const dispatch = useDispatch();
@@ -74,6 +75,7 @@ const ProductPage = () => {
     ...product,
     key: product.id,
     categoryName: product?.categories?.[0]?.category?.name || "Chưa phân loại",
+    // categoryIds: product?.categories?.[0]?.category?.id,
     productImage: product?.images[0]?.image?.path,
     price: product?.variants[0]?.price,
     quantity: product?.variants[0]?.quantity,
@@ -81,6 +83,16 @@ const ProductPage = () => {
 
   return (
     <div>
+      <Button
+        type="primary"
+        icon={<Plus size={18} />}
+        onClick={() => {
+          setEditingProduct({}); // Đối tượng rỗng cho chế độ tạo mới sản phẩm
+          setIsUpdateModalOpen(true);
+        }}
+      >
+        Thêm sản phẩm
+      </Button>
       <TableComponent
         loading={loading}
         onEdit={(record) => {
@@ -101,6 +113,7 @@ const ProductPage = () => {
         handleSelected={handleSelected}
       />
       {/* Modal xác nhận xóa */}
+
       <Modal
         title="Xác nhận xóa"
         open={isDeleteModalOpen}

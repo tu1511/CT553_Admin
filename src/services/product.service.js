@@ -27,6 +27,16 @@ class productService {
     });
     return response.data;
   }
+
+  // create product
+  async createProduct(accessToken, product) {
+    const response = await this.api.post("/", product, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
 }
 
 export default new productService();

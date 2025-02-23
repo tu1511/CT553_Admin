@@ -27,17 +27,19 @@ export const getProducts = createAsyncThunk(
 //   }
 // );
 
-// export const createProduct = createAsyncThunk(
-//   "products/createProduct",
-//   async (product, { rejectWithValue }) => {
-//     try {
-//       const response = await productsService.createProduct(product);
-//       return response;
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data || error.message);
-//     }
-//   }
-// );
+export const createProduct = createAsyncThunk(
+  "products/createProduct",
+  async ({ accessToken, product }, { rejectWithValue }) => {
+    try {
+      const response = await productService.createProduct(accessToken, product);
+      console.log("response", response);
+      return response;
+    } catch (error) {
+      console.log(error.data.message);
+      return rejectWithValue(error.data.message);
+    }
+  }
+);
 
 // export const updateProduct = createAsyncThunk(
 //   "products/updateProduct",
