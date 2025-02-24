@@ -75,7 +75,6 @@ const ProductPage = () => {
     ...product,
     key: product.id,
     categoryName: product?.categories?.[0]?.category?.name || "Chưa phân loại",
-    // categoryIds: product?.categories?.[0]?.category?.id,
     productImage: product?.images[0]?.image?.path,
     price: product?.variants[0]?.price,
     quantity: product?.variants[0]?.quantity,
@@ -83,25 +82,28 @@ const ProductPage = () => {
 
   return (
     <div>
-      <Button
-        type="primary"
-        icon={<Plus size={18} />}
-        onClick={() => {
-          setEditingProduct({}); // Đối tượng rỗng cho chế độ tạo mới sản phẩm
-          setIsUpdateModalOpen(true);
-        }}
-      >
-        Thêm sản phẩm
-      </Button>
+      <div className="flex justify-between items-center mb-4">
+        <div className=""></div>
+        <Button
+          type="primary"
+          icon={<Plus size={28} />}
+          onClick={() => {
+            setEditingProduct({}); // Đối tượng rỗng cho chế độ tạo mới sản phẩm
+            setIsUpdateModalOpen(true);
+          }}
+        >
+          Thêm sản phẩm
+        </Button>
+      </div>
       <TableComponent
         loading={loading}
         onEdit={(record) => {
           setEditingProduct(record);
-          console.log("Sửa sản phẩm:", record);
+          // console.log("Sửa sản phẩm:", record);
           setIsUpdateModalOpen(true);
         }}
         onDelete={(record) => {
-          console.log("Sửa sản phẩm:", record);
+          // console.log("xóa sản phẩm:", record);
 
           setSelectedRowKeys([record.key]);
           setIsDeleteModalOpen(true);

@@ -1,11 +1,29 @@
 import { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Col, Row, Select, Upload } from "antd";
+import moment from "moment";
+import {
+  Modal,
+  Form,
+  Input,
+  Button,
+  Col,
+  Row,
+  Select,
+  Upload,
+  DatePicker,
+} from "antd";
 import { Eye, Edit, Plus } from "lucide-react";
 import slugify from "slugify";
 import DescriptionPopup from "@components/Popup/DescriptionPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategories } from "@redux/thunk/categoryThunk";
-import { createProduct, getProducts } from "@redux/thunk/productThunk";
+import {
+  createProduct,
+  createProductDiscount,
+  // createProductDiscount,
+  getProducts,
+  updateDiscounts,
+  updateProduct,
+} from "@redux/thunk/productThunk";
 import { toast } from "react-toastify";
 import uploadService from "@services/upload.service";
 
@@ -17,24 +35,56 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
 
   // State fileList để quản lý ảnh sản phẩm
   const [fileList, setFileList] = useState([]);
+
+  // State riêng để quản lý discount (tách riêng khỏi form)
+  const [discounts, setDiscounts] = useState([]);
+
+  console.log("discounts", discounts);
+
   const [isDescriptionModalOpen, setDescriptionModalOpen] = useState(false);
+  console.log("product", product);
 
   useEffect(() => {
     if (product) {
       form.setFieldsValue({
         ...product,
+        id: product.id,
+
         categoryIds: product?.categories
           ? product.categories.map((cate) => cate.categoryId)
           : [],
-        discounts: [],
+        discounts: product.productDiscount
+          ? product.productDiscount.map((discount) => ({
+              ...discount,
+              discountValue: discount.discountValue,
+              startDate: discount.startDate ? moment(discount.startDate) : null,
+              endDate: discount.endDate ? moment(discount.endDate) : null,
+            }))
+          : [],
+
         color: product.color || "",
         gender: product.gender || "",
         material: product.material || "",
         completion: product.completion || "",
         stone: product.stone || "",
         variants: product.variants || [],
+        discount: product.productDiscount || [],
+        overview: product.overview || "",
         description: product.description || "",
       });
+
+      if (product.productDiscount && Array.isArray(product.productDiscount)) {
+        const discountData = product.productDiscount.map((discount) => ({
+          ...discount,
+          discountValue: discount.discountValue,
+          startDate: discount.startDate ? moment(discount.startDate) : null,
+          endDate: discount.endDate ? moment(discount.endDate) : null,
+        }));
+        setDiscounts(discountData);
+      } else {
+        setDiscounts([]);
+      }
+
       // Nếu có ảnh, chuyển đổi thành fileList cho Upload
       if (product.images && Array.isArray(product.images)) {
         const initialFileList = product.images.map((img) => ({
@@ -58,6 +108,8 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     dispatch(getCategories());
   }, [product, form, dispatch]);
 
+  console.log("discounts", discounts);
+
   useEffect(() => {
     if (form.getFieldValue("name")) {
       const newSlug = slugify(form.getFieldValue("name"), {
@@ -77,6 +129,11 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
         locale: "vi",
       });
       form.setFieldsValue({ slug: newSlug });
+    }
+
+    if (allValues.discounts !== undefined) {
+      // Nếu người dùng thay đổi giá trị discount, cập nhật state discounts
+      setDiscounts(allValues.discounts || []);
     }
   };
 
@@ -124,15 +181,96 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     try {
       const formData = form.getFieldsValue();
       console.log("Updated Product Data:", formData);
-      // Sử dụng unwrap() nếu bạn dùng createAsyncThunk để nhận lỗi rõ ràng
-      await dispatch(
-        createProduct({ accessToken, product: formData })
-      ).unwrap();
+
+      if (product && Object.keys(product).length > 0) {
+        // Loại bỏ trường discounts khỏi formData (vì discount được quản lý riêng)
+        const {
+          discounts: _ignored,
+          categoryIds: _cat,
+          variants: _variants,
+          uploadedImageIds: _ignored2,
+          ...updatedFormData
+        } = formData;
+
+        // Sau đó, nếu có discount cần cập nhật, gọi API updateDiscounts riêng
+        if (discounts && discounts.length > 0) {
+          // Tách các discount đã có id và chưa có id
+          const existingDiscounts = discounts.filter((d) => d.id);
+          const newDiscounts = discounts.filter((d) => !d.id);
+
+          // Cập nhật các discount đã tồn tại
+          for (let discount of existingDiscounts) {
+            const discountPayload = {
+              discountValue: Number(discount.discountValue),
+              startDate: discount.startDate
+                ? typeof discount.startDate.format === "function"
+                  ? discount.startDate.format("YYYY-MM-DD")
+                  : moment(discount.startDate).format("YYYY-MM-DD")
+                : null,
+              endDate: discount.endDate
+                ? typeof discount.endDate.format === "function"
+                  ? discount.endDate.format("YYYY-MM-DD")
+                  : moment(discount.endDate).format("YYYY-MM-DD")
+                : null,
+            };
+
+            console.log("Updating discountPayload", discountPayload);
+
+            await dispatch(
+              updateDiscounts({
+                accessToken,
+                productId: product.id,
+                ...discountPayload,
+              })
+            ).unwrap();
+          }
+
+          // Tạo mới các discount chưa có id
+          for (let discount of newDiscounts) {
+            const discountPayload = {
+              discountValue: Number(discount.discountValue),
+              startDate: discount.startDate
+                ? typeof discount.startDate.format === "function"
+                  ? discount.startDate.format("YYYY-MM-DD")
+                  : moment(discount.startDate).format("YYYY-MM-DD")
+                : null,
+              endDate: discount.endDate
+                ? typeof discount.endDate.format === "function"
+                  ? discount.endDate.format("YYYY-MM-DD")
+                  : moment(discount.endDate).format("YYYY-MM-DD")
+                : null,
+            };
+
+            console.log("Creating discountPayload", discountPayload);
+
+            await dispatch(
+              createProductDiscount({
+                accessToken,
+                productId: product.id,
+                ...discountPayload,
+              })
+            ).unwrap();
+          }
+          toast.success("Discount đã được cập nhật và tạo mới thành công!");
+        }
+
+        // Cập nhật dữ liệu sản phẩm trước
+        await dispatch(
+          updateProduct({ accessToken, product: updatedFormData })
+        ).unwrap();
+        toast.success("Cập nhật sản phẩm thành công!");
+      } else {
+        // Nếu không có sản phẩm, tạo sản phẩm mới
+        await dispatch(
+          createProduct({ accessToken, product: formData })
+        ).unwrap();
+        toast.success("Tạo sản phẩm thành công!");
+        // Trong trường hợp tạo mới, bạn có thể gọi API tạo discount riêng sau nếu cần.
+      }
       dispatch(getProducts({}));
-      toast.success("Tạo sản phẩm thành công!");
     } catch (error) {
-      console.error("Lỗi khi tạo sản phẩm:", error);
-      toast.error("Lỗi khi tạo sản phẩm!");
+      console.error("Lỗi khi gửi sản phẩm:", error);
+      toast.error("Lỗi khi gửi sản phẩm!");
     } finally {
       onClose();
     }
@@ -168,9 +306,72 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
           <Form.Item label="Slug" name="slug">
             <Input disabled />
           </Form.Item>
-          <Form.Item label="Discount" name="discounts">
-            <Input disabled />
-          </Form.Item>
+
+          <Form.List name="discounts">
+            {(fields, { add, remove }) => (
+              <>
+                <h3 className="text-lg font-semibold mb-2">Discount</h3>
+                {fields.map((field) => (
+                  <Row gutter={16} key={field.key}>
+                    <Col span={8}>
+                      <Form.Item
+                        {...field}
+                        label="Discount Value"
+                        name={[field.name, "discountValue"]}
+                        fieldKey={[field.fieldKey, "discountValue"]}
+                        rules={[
+                          { required: true, message: "Nhập discount value" },
+                        ]}
+                      >
+                        <Input type="number" placeholder="10" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      <Form.Item
+                        {...field}
+                        label="Start Date"
+                        name={[field.name, "startDate"]}
+                        fieldKey={[field.fieldKey, "startDate"]}
+                        rules={[
+                          { required: true, message: "Chọn ngày bắt đầu" },
+                        ]}
+                        // Nếu cần thiết lập initialValue, bạn có thể chuyển đổi bằng moment
+                      >
+                        <DatePicker
+                          format="YYYY-MM-DD"
+                          style={{ width: "100%" }}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      <Form.Item
+                        {...field}
+                        label="End Date"
+                        name={[field.name, "endDate"]}
+                        fieldKey={[field.fieldKey, "endDate"]}
+                        rules={[
+                          { required: true, message: "Chọn ngày kết thúc" },
+                        ]}
+                      >
+                        <DatePicker
+                          format="YYYY-MM-DD"
+                          style={{ width: "100%" }}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ))}
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<Plus />}
+                >
+                  Thêm discount
+                </Button>
+              </>
+            )}
+          </Form.List>
 
           {/* Nhóm 1: Thông tin chung */}
           <div className="mb-4 p-4 border rounded-lg shadow-sm">
@@ -279,6 +480,9 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
               </>
             )}
           </Form.List>
+          <Form.Item name="id" hidden>
+            <Input />
+          </Form.Item>
 
           <Form.Item label="Hình ảnh sản phẩm" name="uploadedImageIds">
             <Upload

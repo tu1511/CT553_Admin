@@ -47,6 +47,17 @@ class categoryService {
 
     return response.data;
   }
+
+  //delete category
+  async deleteCategory(id, accessToken) {
+    const response = await this.api.delete(`/${id}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.data;
+  }
 }
 
 export default new categoryService();

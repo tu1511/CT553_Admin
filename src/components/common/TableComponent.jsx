@@ -133,16 +133,6 @@ const TableComponent = ({
 
   return (
     <div className="w-full overflow-x-auto p-4 bg-white shadow rounded-lg">
-      <div className="mb-4 flex justify-between items-center">
-        <Button
-          onClick={handleExportExcel}
-          type="primary"
-          icon={<FileSpreadsheet size={18} />}
-        >
-          Xuất Excel
-        </Button>
-      </div>
-
       <Table
         loading={loading}
         rowSelection={rowSelection}
@@ -154,6 +144,15 @@ const TableComponent = ({
         }
         bordered
       />
+      <div className="flex justify-between items-center">
+        <Button
+          onClick={handleExportExcel}
+          type="primary"
+          icon={<FileSpreadsheet size={18} />}
+        >
+          Xuất Excel
+        </Button>
+      </div>
     </div>
   );
 };

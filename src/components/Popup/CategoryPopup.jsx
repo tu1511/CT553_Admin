@@ -9,6 +9,7 @@ import {
 } from "@redux/thunk/categoryThunk";
 import uploadService from "@services/upload.service";
 import { toast } from "react-toastify";
+import slugify from "slugify";
 
 const { Option } = Select;
 
@@ -81,14 +82,30 @@ const CategoryPopup = ({ isOpen, onClose, data }) => {
         dispatch(getCategories());
         toast.success("Cập nhật danh mục thành công!");
       } else {
-        await dispatch(createCategory(formData, accessToken)).unwrap();
+        await dispatch(
+          createCategory({ data: formData, accessToken })
+        ).unwrap();
         dispatch(getCategories());
         toast.success("Thêm danh mục thành công!");
       }
+
+      form.resetFields();
+      setFileList([]);
       onClose();
     } catch (error) {
       console.error("Lỗi khi gửi form:", error);
       toast.error("Lỗi khi gửi form");
+    }
+  };
+
+  const handleValuesChange = (_, allValues) => {
+    if (allValues.name) {
+      const newSlug = slugify(allValues.name, {
+        lower: true,
+        strict: true,
+        locale: "vi",
+      });
+      form.setFieldsValue({ slug: newSlug });
     }
   };
 
@@ -99,7 +116,7 @@ const CategoryPopup = ({ isOpen, onClose, data }) => {
       onCancel={onClose}
       footer={null}
     >
-      <Form form={form} layout="vertical">
+      <Form form={form} layout="vertical" onValuesChange={handleValuesChange}>
         <Form.Item
           label="Tên danh mục"
           name="name"
@@ -108,14 +125,9 @@ const CategoryPopup = ({ isOpen, onClose, data }) => {
           <Input />
         </Form.Item>
 
-        <Form.Item
-          label="Slug"
-          name="slug"
-          rules={[{ required: true, message: "Vui lòng nhập slug!" }]}
-        >
-          <Input />
+        <Form.Item label="Slug" name="slug">
+          <Input disabled />
         </Form.Item>
-
         <Form.Item label="Danh mục cha" name="parentId">
           <Select allowClear placeholder="Chọn danh mục cha">
             <Option key="none" value={null}>

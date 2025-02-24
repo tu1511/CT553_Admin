@@ -37,6 +37,65 @@ class productService {
     });
     return response.data;
   }
+
+  // update product
+  async updateProduct(accessToken, product) {
+    const response = await this.api.put(`/${product.id}`, product, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
+
+  //update discounts
+  async updateDiscounts(
+    accessToken,
+    productId,
+    discountValue,
+    startDate,
+    endDate
+  ) {
+    const response = await this.api.put(
+      `/${productId}/discount`,
+      {
+        productId,
+        discountValue,
+        startDate,
+        endDate,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  //  create product discount
+  async createProductDiscount(
+    accessToken,
+    productId,
+    discountValue,
+    startDate,
+    endDate
+  ) {
+    const response = await this.api.post(
+      `/${productId}/discount`,
+      {
+        discountValue,
+        startDate,
+        endDate,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  }
 }
 
 export default new productService();

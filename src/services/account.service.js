@@ -6,11 +6,14 @@ class accountService {
   }
 
   // get all account
-  async getAllAccount(limit, page) {
+  async getAllAccount(limit, page, accessToken) {
     const response = await this.api.get("/", {
       params: {
         limit,
         page,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return response.data;
@@ -46,11 +49,16 @@ class accountService {
 
   // toggle account active
   async toggleActive(id, accessToken) {
-    const response = await this.api.put(`/toggleActive/${id}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await this.api.put(
+      `/toggleActive/${id}`,
+      {},
+
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
     return response.data;
   }
 }

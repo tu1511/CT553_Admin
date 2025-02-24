@@ -1,5 +1,6 @@
 import {
   createCategory,
+  deleteCategory,
   getCategories,
   updateCategory,
 } from "@redux/thunk/categoryThunk";
@@ -54,16 +55,16 @@ const categorySlice = createSlice({
             : category
         );
       })
-      .addCase(updateCategory.rejected, setError);
+      .addCase(updateCategory.rejected, setError)
 
-    //   .addCase(deleteCategory.pending, setLoading)
-    //   .addCase(deleteCategory.fulfilled, (state, action) => {
-    //     setFulfilled(state);
-    //     state.categories = state.categories.filter(
-    //       (category) => category._id !== action.payload
-    //     );
-    //   })
-    //   .addCase(deleteCategory.rejected, setError);
+      .addCase(deleteCategory.pending, setLoading)
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.categories = state.categories.filter(
+          (category) => category._id !== action.payload?.metadata
+        );
+      })
+      .addCase(deleteCategory.rejected, setError);
   },
 });
 

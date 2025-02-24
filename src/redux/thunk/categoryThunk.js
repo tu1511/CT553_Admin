@@ -15,12 +15,9 @@ export const getCategories = createAsyncThunk(
 
 export const createCategory = createAsyncThunk(
   "category/createCategory",
-  async (category, accessToken, { rejectWithValue }) => {
+  async ({ data, accessToken }, { rejectWithValue }) => {
     try {
-      const response = await categoryService.createCategory(
-        category,
-        accessToken
-      );
+      const response = await categoryService.createCategory(data, accessToken);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -44,14 +41,15 @@ export const updateCategory = createAsyncThunk(
   }
 );
 
-// export const deleteCategory = createAsyncThunk(
-//   "category/deleteCategory",
-//   async (id, { rejectWithValue }) => {
-//     try {
-//       await categoryService.deleteCategory(id);
-//       return id;
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data || error.message);
-//     }
-//   }
-// );
+//delete category
+export const deleteCategory = createAsyncThunk(
+  "category/deleteCategory",
+  async ({ id, accessToken }, { rejectWithValue }) => {
+    try {
+      const response = await categoryService.deleteCategory(id, accessToken);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);

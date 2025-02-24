@@ -1,9 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState, useMemo } from "react";
-import { Modal, Tooltip } from "antd";
-import { getCategories } from "@redux/thunk/categoryThunk";
+import { Button, Modal, Tooltip } from "antd";
+import { deleteCategory, getCategories } from "@redux/thunk/categoryThunk";
 import CategoryPopup from "@components/Popup/CategoryPopup";
 import TableComponent from "@components/common/TableComponent";
+import { Plus } from "lucide-react";
+import { toast } from "react-toastify";
 
 const CategoryPage = () => {
   const dispatch = useDispatch();
@@ -12,6 +14,8 @@ const CategoryPage = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const accessToken = localStorage.getItem("accessToken");
 
   useEffect(() => {
     dispatch(getCategories());
@@ -26,7 +30,16 @@ const CategoryPage = () => {
 
   const confirmDelete = async () => {
     setIsDeleteModalOpen(false);
-    // TODO: Xử lý xóa danh mục
+    try {
+      const categoryId = selectedRows[0]?._id;
+      // Dispatch deleteCategory và sử dụng unwrap() để nhận lỗi nếu có
+      await dispatch(deleteCategory({ id: categoryId, accessToken })).unwrap();
+      dispatch(getCategories());
+      toast.success("Xóa danh mục thành công!");
+    } catch (error) {
+      console.error("Lỗi khi xóa danh mục:", error);
+      toast.error("Lỗi khi xóa danh mục!");
+    }
   };
 
   const flatCategories = useMemo(() => {
@@ -133,18 +146,30 @@ const CategoryPage = () => {
 
   return (
     <div>
+      <div className="flex justify-between items-center mb-4">
+        <div className=""></div>
+        <Button
+          type="primary"
+          icon={<Plus size={28} />}
+          onClick={() => {
+            setIsUpdateModalOpen(true);
+          }}
+        >
+          Thêm danh mục
+        </Button>
+      </div>
       <TableComponent
         loading={loading}
         rows={flatCategories}
         columns={columns}
         pagination={{ pageSize: 5 }}
         onEdit={(record) => {
-          console.log("Sửa danh mục:", record);
+          // console.log("Sửa danh mục:", record);
           setSelectedRows([record]);
           setIsUpdateModalOpen(true);
         }}
         onDelete={(record) => {
-          console.log("Xóa danh mục:", record);
+          // console.log("Xóa danh mục:", record);
           setSelectedRows([record]);
           setIsDeleteModalOpen(true);
         }}

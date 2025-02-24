@@ -14,9 +14,11 @@ const AccountPage = () => {
   const [selectedAccount, setSelectedAccount] = useState(null); // State lưu tài khoản được chọn
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const accessToken = localStorage.getItem("accessToken");
+
   useEffect(() => {
-    dispatch(getAllAccount({ limit: 10, page: -1 }));
-  }, [dispatch]);
+    dispatch(getAllAccount({ limit: 10, page: -1, accessToken }));
+  }, [dispatch, accessToken]);
 
   // toggle active account
   // const toggleActive = async () => {
@@ -40,7 +42,7 @@ const AccountPage = () => {
     setIsDeleteModalOpen(false);
     toast.success("Xóa tài khoản thành công!");
   };
-  const accessToken = localStorage.getItem("accessToken");
+
   const confirmUpdate = async () => {
     console.log("Cập nhật tài khoản:", selectedAccount);
     setIsUpdateModalOpen(false);
@@ -52,12 +54,13 @@ const AccountPage = () => {
 
     try {
       // Gọi API cập nhật trạng thái
+
       await dispatch(
         toggleActiveAccount({ id: selectedAccount.id, accessToken })
-      );
+      ).unwrap();
 
       // Gọi lại API để lấy dữ liệu mới
-      dispatch(getAllAccount({ limit: 10, page: -1 }));
+      dispatch(getAllAccount({ limit: 10, page: -1, accessToken }));
 
       toast.success("Cập nhật tài khoản thành công!");
     } catch (error) {
