@@ -28,6 +28,16 @@ class productService {
     return response.data;
   }
 
+  //get one by slug
+  async getOneBySlugWithAllDiscounts(accessToken, slug) {
+    const response = await this.api.get(`/slug/allDiscounts/${slug}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
+
   // create product
   async createProduct(accessToken, product) {
     const response = await this.api.post("/", product, {

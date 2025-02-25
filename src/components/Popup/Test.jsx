@@ -26,7 +26,6 @@ import {
 } from "@redux/thunk/productThunk";
 import { toast } from "react-toastify";
 import uploadService from "@services/upload.service";
-import productService from "@services/product.service";
 
 const PopupProduct = ({ isOpen, onClose, product }) => {
   const [form] = Form.useForm();
@@ -39,43 +38,23 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
 
   // State riêng để quản lý discount (tách riêng khỏi form)
   const [discounts, setDiscounts] = useState([]);
-  const [curProduct, setCurProduct] = useState();
-  const accessToken = localStorage.getItem("accessToken");
-
-  useEffect(() => {
-    const fetchProductDiscounts = async () => {
-      if (product) {
-        try {
-          const response = await productService.getOneBySlugWithAllDiscounts(
-            accessToken,
-            product.slug
-          );
-          setCurProduct(response?.metadata);
-        } catch (error) {
-          console.error("Error fetching product discounts:", error);
-        }
-      }
-    };
-    fetchProductDiscounts();
-  }, [product, accessToken]);
 
   console.log("discounts", discounts);
-  console.log("curProduct", curProduct);
 
   const [isDescriptionModalOpen, setDescriptionModalOpen] = useState(false);
   console.log("product", product);
 
   useEffect(() => {
-    if (curProduct) {
+    if (product) {
       form.setFieldsValue({
-        ...curProduct,
-        id: curProduct.id,
+        ...product,
+        id: product.id,
 
-        categoryIds: curProduct?.categories
-          ? curProduct.categories.map((cate) => cate.categoryId)
+        categoryIds: product?.categories
+          ? product.categories.map((cate) => cate.categoryId)
           : [],
-        discounts: curProduct.productDiscount
-          ? curProduct.productDiscount.map((discount) => ({
+        discounts: product.productDiscount
+          ? product.productDiscount.map((discount) => ({
               ...discount,
               discountValue: discount.discountValue,
               startDate: discount.startDate ? moment(discount.startDate) : null,
@@ -83,22 +62,19 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
             }))
           : [],
 
-        color: curProduct.color || "",
-        gender: curProduct.gender || "",
-        material: curProduct.material || "",
-        completion: curProduct.completion || "",
-        stone: curProduct.stone || "",
-        variants: curProduct.variants || [],
-        discount: curProduct.productDiscount || [],
-        overview: curProduct.overview || "",
-        description: curProduct.description || "",
+        color: product.color || "",
+        gender: product.gender || "",
+        material: product.material || "",
+        completion: product.completion || "",
+        stone: product.stone || "",
+        variants: product.variants || [],
+        discount: product.productDiscount || [],
+        overview: product.overview || "",
+        description: product.description || "",
       });
 
-      if (
-        curProduct.productDiscount &&
-        Array.isArray(curProduct.productDiscount)
-      ) {
-        const discountData = curProduct.productDiscount.map((discount) => ({
+      if (product.productDiscount && Array.isArray(product.productDiscount)) {
+        const discountData = product.productDiscount.map((discount) => ({
           ...discount,
           discountValue: discount.discountValue,
           startDate: discount.startDate ? moment(discount.startDate) : null,
@@ -110,8 +86,8 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
       }
 
       // Nếu có ảnh, chuyển đổi thành fileList cho Upload
-      if (curProduct.images && Array.isArray(curProduct.images)) {
-        const initialFileList = curProduct.images.map((img) => ({
+      if (product.images && Array.isArray(product.images)) {
+        const initialFileList = product.images.map((img) => ({
           uid: img.imageId ? img.imageId : img.id,
           name: img.image?.filename || "image",
           url: img.image?.path,
@@ -130,7 +106,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
       setFileList([]);
     }
     dispatch(getCategories());
-  }, [curProduct, form, dispatch]);
+  }, [product, form, dispatch]);
 
   console.log("discounts", discounts);
 
@@ -156,20 +132,8 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     }
 
     if (allValues.discounts !== undefined) {
-      const discountData = (allValues.discounts || []).map((discount) => ({
-        ...discount,
-        startDate: discount.startDate
-          ? typeof discount.startDate.format === "function"
-            ? discount.startDate
-            : moment(discount.startDate)
-          : null,
-        endDate: discount.endDate
-          ? typeof discount.endDate.format === "function"
-            ? discount.endDate
-            : moment(discount.endDate)
-          : null,
-      }));
-      setDiscounts(discountData);
+      // Nếu người dùng thay đổi giá trị discount, cập nhật state discounts
+      setDiscounts(allValues.discounts || []);
     }
   };
 
@@ -211,12 +175,14 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     }
   };
 
+  const accessToken = localStorage.getItem("accessToken");
+
   const handleSave = async () => {
     try {
       const formData = form.getFieldsValue();
       console.log("Updated Product Data:", formData);
 
-      if (curProduct && Object.keys(curProduct).length > 0) {
+      if (product && Object.keys(product).length > 0) {
         // Loại bỏ trường discounts khỏi formData (vì discount được quản lý riêng)
         const {
           discounts: _ignored,
@@ -253,7 +219,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
             await dispatch(
               updateDiscounts({
                 accessToken,
-                productId: curProduct.id,
+                productId: product.id,
                 ...discountPayload,
               })
             ).unwrap();
@@ -280,12 +246,12 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
             await dispatch(
               createProductDiscount({
                 accessToken,
-                productId: curProduct.id,
+                productId: product.id,
                 ...discountPayload,
               })
             ).unwrap();
           }
-          // toast.success("Discount đã được cập nhật và tạo mới thành công!");
+          toast.success("Discount đã được cập nhật và tạo mới thành công!");
         }
 
         // Cập nhật dữ liệu sản phẩm trước
@@ -317,7 +283,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
       <Modal
         title={
           <span className="flex items-center gap-2">
-            {curProduct && Object.keys(curProduct).length > 0 ? (
+            {product && Object.keys(product).length > 0 ? (
               <>
                 <Eye size={20} /> Chỉnh sửa sản phẩm
               </>
@@ -350,7 +316,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                     <Col span={8}>
                       <Form.Item
                         {...field}
-                        label="% giảm giá"
+                        label="Discount Value"
                         name={[field.name, "discountValue"]}
                         fieldKey={[field.fieldKey, "discountValue"]}
                         rules={[
@@ -363,7 +329,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                     <Col span={8}>
                       <Form.Item
                         {...field}
-                        label="Ngày bắt đầu"
+                        label="Start Date"
                         name={[field.name, "startDate"]}
                         fieldKey={[field.fieldKey, "startDate"]}
                         rules={[
@@ -380,7 +346,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                     <Col span={8}>
                       <Form.Item
                         {...field}
-                        label="Ngày kết thúc"
+                        label="End Date"
                         name={[field.name, "endDate"]}
                         fieldKey={[field.fieldKey, "endDate"]}
                         rules={[

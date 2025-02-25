@@ -15,18 +15,6 @@ export const getProducts = createAsyncThunk(
   }
 );
 
-// export const getProductById = createAsyncThunk(
-//   "products/getProductById",
-//   async (id, { rejectWithValue }) => {
-//     try {
-//       const response = await productsService.getProductById(id);
-//       return response;
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data || error.message);
-//     }
-//   }
-// );
-
 export const createProduct = createAsyncThunk(
   "products/createProduct",
   async ({ accessToken, product }, { rejectWithValue }) => {
