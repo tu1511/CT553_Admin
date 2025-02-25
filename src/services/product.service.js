@@ -106,6 +106,62 @@ class productService {
     );
     return response.data;
   }
+
+  // create category for product
+  async createCategoryForProduct(accessToken, productId, categoryId) {
+    const response = await this.api.post(
+      `/${productId}/add-category`,
+      { categoryId },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  // delete category for product
+
+  async deleteCategoryForProduct(accessToken, productId, categoryId) {
+    const response = await this.api.delete(
+      `/${productId}/delete-category/${categoryId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  // add image for product
+  async addImageForProduct(accessToken, productId, uploadedImageId) {
+    const response = await this.api.post(
+      `/${productId}/add-image`,
+      { uploadedImageId },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  // delete image for product
+  async deleteImageForProduct(accessToken, productId, productImageId) {
+    const response = await this.api.delete(`/delete-image/${productImageId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params: {
+        productId,
+        productImageId,
+      },
+    });
+    return response.data;
+  }
 }
 
 export default new productService();

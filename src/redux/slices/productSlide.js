@@ -1,6 +1,10 @@
 import {
+  addImage,
+  createCategory,
   createProduct,
   createProductDiscount,
+  deleteCategory,
+  deleteImage,
   getProducts,
   updateDiscounts,
   updateProduct,
@@ -82,7 +86,39 @@ const productSlice = createSlice({
           ? action.payload.metadata
           : [];
       })
-      .addCase(createProductDiscount.rejected, setError);
+      .addCase(createProductDiscount.rejected, setError)
+      .addCase(createCategory.pending, setLoading)
+      .addCase(createCategory.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.products = Array.isArray(action.payload?.metadata)
+          ? action.payload.metadata
+          : [];
+      })
+      .addCase(createCategory.rejected, setError)
+      .addCase(deleteCategory.pending, setLoading)
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.products = state.products.filter(
+          (product) => product._id !== action.payload
+        );
+      })
+      .addCase(deleteCategory.rejected, setError)
+      .addCase(addImage.pending, setLoading)
+      .addCase(addImage.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.products = Array.isArray(action.payload?.metadata)
+          ? action.payload.metadata
+          : [];
+      })
+      .addCase(addImage.rejected, setError)
+      .addCase(deleteImage.pending, setLoading)
+      .addCase(deleteImage.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.products = Array.isArray(action.payload?.metadata)
+          ? action.payload.metadata
+          : [];
+      })
+      .addCase(deleteImage.rejected, setError);
 
     //   .addCase(deleteProduct.pending, setLoading)
     //   .addCase(deleteProduct.fulfilled, (state, action) => {

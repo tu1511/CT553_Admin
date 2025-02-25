@@ -85,6 +85,74 @@ export const createProductDiscount = createAsyncThunk(
   }
 );
 
+// create category for product
+export const createCategory = createAsyncThunk(
+  "products/createCategory",
+  async ({ accessToken, productId, categoryId }, { rejectWithValue }) => {
+    try {
+      const response = await productService.createCategoryForProduct(
+        accessToken,
+        productId,
+        categoryId
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// delete category for product
+export const deleteCategory = createAsyncThunk(
+  "products/deleteCategory",
+  async ({ accessToken, productId, categoryId }, { rejectWithValue }) => {
+    try {
+      const response = await productService.deleteCategoryForProduct(
+        accessToken,
+        productId,
+        categoryId
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// add image for product
+export const addImage = createAsyncThunk(
+  "products/addImage",
+  async ({ accessToken, productId, uploadedImageId }, { rejectWithValue }) => {
+    try {
+      const response = await productService.addImageForProduct(
+        accessToken,
+        productId,
+        uploadedImageId
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// delete image for product
+export const deleteImage = createAsyncThunk(
+  "products/deleteImage",
+  async ({ accessToken, productId, productImageId }, { rejectWithValue }) => {
+    try {
+      const response = await productService.deleteImageForProduct(
+        accessToken,
+        productId,
+        productImageId
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 // export const deleteProduct = createAsyncThunk(
 //   "products/deleteProduct",
 //   async (id, { rejectWithValue }) => {

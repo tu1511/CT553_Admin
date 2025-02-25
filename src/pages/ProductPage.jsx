@@ -16,8 +16,6 @@ const ProductPage = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  console.log("editingProduct:", editingProduct);
-
   useEffect(() => {
     dispatch(getProducts({}));
   }, [dispatch]);

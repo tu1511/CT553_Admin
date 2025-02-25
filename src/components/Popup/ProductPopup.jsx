@@ -17,8 +17,12 @@ import DescriptionPopup from "@components/Popup/DescriptionPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategories } from "@redux/thunk/categoryThunk";
 import {
+  addImage,
+  createCategory,
   createProduct,
   createProductDiscount,
+  deleteCategory,
+  deleteImage,
   // createProductDiscount,
   getProducts,
   updateDiscounts,
@@ -36,9 +40,12 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
 
   // State fileList để quản lý ảnh sản phẩm
   const [fileList, setFileList] = useState([]);
+  const fileListIds = fileList.map((file) => file.uid);
 
   // State riêng để quản lý discount (tách riêng khỏi form)
   const [discounts, setDiscounts] = useState([]);
+  const [categoryIds, setCategoryIds] = useState([]);
+  const [uploadedImageIds, setUploadedImageIds] = useState([]);
   const [curProduct, setCurProduct] = useState();
   const accessToken = localStorage.getItem("accessToken");
 
@@ -59,11 +66,50 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     fetchProductDiscounts();
   }, [product, accessToken]);
 
-  console.log("discounts", discounts);
-  console.log("curProduct", curProduct);
+  const cateIds = Array.isArray(curProduct?.categories)
+    ? curProduct.categories.map((cate) => cate.categoryId) || []
+    : [];
+
+  const imageIds = Array.isArray(curProduct?.images)
+    ? curProduct.images.map((img) => img.id) || []
+    : [];
+
+  const Image = Array.isArray(curProduct?.images)
+    ? curProduct.images.map((img) => img.imageId) || []
+    : [];
+
+  console.log("imageIds", imageIds);
+  // console.log("Image", Image);
+  // console.log("fileListIds", fileListIds);
+  // console.log("fileList", fileList);
+
+  // index of image that deleted
+  const deletedImageIndex = Image.filter(
+    (imageId) => !fileListIds.includes(imageId)
+  );
+
+  // an array that has position of deletedImageIndex in Image
+  const deletedImageIndexPosition = deletedImageIndex.map((imageId) =>
+    Image.indexOf(imageId)
+  );
+
+  // deleted index of image in imageIds
+  const deletedImageIds = deletedImageIndexPosition.map(
+    (index) => imageIds[index]
+  );
+
+  console.log("deletedImageIds", deletedImageIds);
+  console.log("-------------------------------------------------");
+
+  // console.log("uploadedImageIds", uploadedImageIds);
+
+  // console.log("discounts", discounts);
+  // console.log("curProduct", curProduct);
+  //   console.log("cateIds", cateIds);
+  // console.log("categoryIds", categoryIds);
+  // console.log("product", product);
 
   const [isDescriptionModalOpen, setDescriptionModalOpen] = useState(false);
-  console.log("product", product);
 
   useEffect(() => {
     if (curProduct) {
@@ -83,12 +129,21 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
             }))
           : [],
 
+        uploadedImageIds: curProduct.images
+          ? curProduct.images.map((img) => img.id)
+          : [],
+
         color: curProduct.color || "",
         gender: curProduct.gender || "",
         material: curProduct.material || "",
         completion: curProduct.completion || "",
         stone: curProduct.stone || "",
-        variants: curProduct.variants || [],
+        variants: curProduct.variants
+          ? curProduct.variants.map((v) => ({
+              ...v,
+              price: v.price || v.priceHistory?.[0]?.price || 0,
+            }))
+          : [],
         discount: curProduct.productDiscount || [],
         overview: curProduct.overview || "",
         description: curProduct.description || "",
@@ -107,6 +162,17 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
         setDiscounts(discountData);
       } else {
         setDiscounts([]);
+      }
+
+      if (curProduct.categories && Array.isArray(curProduct.categories)) {
+        const initialCategoryIds = curProduct.categories.map(
+          (cate) => cate.categoryId
+        );
+        setCategoryIds(initialCategoryIds);
+        form.setFieldsValue({ categoryIds: initialCategoryIds });
+      } else {
+        setCategoryIds([]);
+        form.setFieldsValue({ categoryIds: [] });
       }
 
       // Nếu có ảnh, chuyển đổi thành fileList cho Upload
@@ -131,8 +197,6 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     }
     dispatch(getCategories());
   }, [curProduct, form, dispatch]);
-
-  console.log("discounts", discounts);
 
   useEffect(() => {
     if (form.getFieldValue("name")) {
@@ -171,43 +235,72 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
       }));
       setDiscounts(discountData);
     }
+
+    if (allValues.categoryIds !== undefined) {
+      setCategoryIds(allValues.categoryIds);
+    }
+
+    if (allValues.uploadedImageIds !== undefined) {
+      setUploadedImageIds(allValues.uploadedImageIds);
+    }
   };
 
   const handleImageUpload = async ({ file, fileList: newFileList }) => {
-    // Lấy file gốc từ newFileList (originFileObj) để upload
-    const filesToUpload = newFileList
-      .map((f) => f.originFileObj)
-      .filter(Boolean);
-
-    // Kiểm tra loại file, nếu có file nào không phải image thì báo lỗi
-    if (filesToUpload.some((file) => !file.type.startsWith("image/"))) {
-      return toast.error("Chỉ được phép tải lên ảnh!");
+    // Nếu file có trạng thái "removed", cập nhật lại fileList và form mà không gọi API.
+    if (file.status === "removed") {
+      setFileList(newFileList);
+      form.setFieldsValue({
+        uploadedImageIds: newFileList.map((f) => f.uid),
+        images: newFileList,
+      });
+      return;
     }
 
-    try {
-      // Gọi API uploadImages với mảng các file
-      const response = await uploadService.uploadImages(filesToUpload);
-      if (response?.metadata) {
-        // response.metadata là mảng thông tin của các file đã upload
-        const uploadedFiles = response.metadata.map((meta) => ({
-          uid: meta.id,
-          name: meta.filename || "image",
-          url: meta.path,
-        }));
+    // Tách ra các file đã được upload và các file mới (có originFileObj)
+    const alreadyUploaded = newFileList.filter((f) => !f.originFileObj);
+    const toUpload = newFileList.filter((f) => f.originFileObj);
 
-        // Cập nhật state fileList để hiển thị ảnh đã upload
-        setFileList(uploadedFiles);
-        // Cập nhật trường uploadedImageIds trong form với mảng các uid
-        form.setFieldsValue({
-          uploadedImageIds: uploadedFiles.map((file) => file.uid),
-          images: uploadedFiles,
-        });
-        toast.success("Tải ảnh lên thành công");
-      } else {
-        toast.error("Lỗi khi tải ảnh lên");
+    // Nếu có file mới cần upload, tiến hành upload
+    if (toUpload.length > 0) {
+      // Kiểm tra loại file
+      const filesToUpload = toUpload
+        .map((f) => f.originFileObj)
+        .filter(Boolean);
+      if (filesToUpload.some((file) => !file.type.startsWith("image/"))) {
+        return toast.error("Chỉ được phép tải lên ảnh!");
       }
-    } catch (error) {
-      toast.error("Tải ảnh lên thất bại");
+
+      try {
+        // Gọi API uploadImages với mảng các file mới
+        const response = await uploadService.uploadImages(filesToUpload);
+        if (response?.metadata) {
+          const uploadedFiles = response.metadata.map((meta) => ({
+            uid: meta.id,
+            name: meta.filename || "image",
+            url: meta.path,
+          }));
+
+          // Kết hợp file đã upload với file mới vừa upload
+          const mergedFiles = [...alreadyUploaded, ...uploadedFiles];
+          setFileList(mergedFiles);
+          form.setFieldsValue({
+            uploadedImageIds: mergedFiles.map((file) => file.uid),
+            images: mergedFiles,
+          });
+          toast.success("Tải ảnh lên thành công");
+        } else {
+          toast.error("Lỗi khi tải ảnh lên");
+        }
+      } catch (error) {
+        toast.error("Tải ảnh lên thất bại");
+      }
+    } else {
+      // Nếu không có file mới cần upload, chỉ cập nhật fileList và form
+      setFileList(newFileList);
+      form.setFieldsValue({
+        uploadedImageIds: newFileList.map((f) => f.uid),
+        images: newFileList,
+      });
     }
   };
 
@@ -286,6 +379,75 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
             ).unwrap();
           }
           // toast.success("Discount đã được cập nhật và tạo mới thành công!");
+        }
+
+        if (cateIds && categoryIds) {
+          // Tính mảng các category cần xóa: có trong cateIds nhưng không có trong categoryIds
+          const toDelete = cateIds.filter(
+            (cateId) => !categoryIds.includes(cateId)
+          );
+          // Tính mảng các category cần thêm: có trong categoryIds nhưng không có trong cateIds
+          const toAdd = categoryIds.filter(
+            (cateId) => !cateIds.includes(cateId)
+          );
+
+          if (toDelete.length > 0) {
+            const deletePromises = toDelete.map((cateId) =>
+              dispatch(
+                deleteCategory({
+                  accessToken,
+                  productId: curProduct.id,
+                  categoryId: cateId,
+                })
+              ).unwrap()
+            );
+            await Promise.all(deletePromises);
+          }
+
+          if (toAdd.length > 0) {
+            const createPromises = toAdd.map((cateId) =>
+              dispatch(
+                createCategory({
+                  accessToken,
+                  productId: curProduct.id,
+                  categoryId: cateId,
+                })
+              ).unwrap()
+            );
+            await Promise.all(createPromises);
+          }
+        }
+
+        if (imageIds && uploadedImageIds) {
+          const toAddImage = fileListIds.filter(
+            (imageId) => !Image.includes(imageId)
+          );
+          console.log("toAddImage", toAddImage);
+          if (toAddImage.length > 0) {
+            const createPromises = toAddImage.map((ImageId) =>
+              dispatch(
+                addImage({
+                  accessToken,
+                  productId: curProduct.id,
+                  uploadedImageId: ImageId,
+                })
+              ).unwrap()
+            );
+            await Promise.all(createPromises);
+          }
+        }
+
+        if (deletedImageIds) {
+          const deletePromises = deletedImageIds.map((ImageId) =>
+            dispatch(
+              deleteImage({
+                accessToken,
+                productId: curProduct.id,
+                productImageId: ImageId,
+              })
+            ).unwrap()
+          );
+          await Promise.all(deletePromises);
         }
 
         // Cập nhật dữ liệu sản phẩm trước
