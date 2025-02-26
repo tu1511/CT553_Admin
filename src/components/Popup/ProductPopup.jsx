@@ -11,7 +11,7 @@ import {
   Upload,
   DatePicker,
 } from "antd";
-import { Eye, Edit, Plus } from "lucide-react";
+import { Eye, Edit, Plus, Trash2 } from "lucide-react";
 import slugify from "slugify";
 import DescriptionPopup from "@components/Popup/DescriptionPopup";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,6 +31,7 @@ import {
 import { toast } from "react-toastify";
 import uploadService from "@services/upload.service";
 import productService from "@services/product.service";
+import variantService from "@services/variant.service";
 
 const PopupProduct = ({ isOpen, onClose, product }) => {
   const [form] = Form.useForm();
@@ -46,6 +47,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
   const [discounts, setDiscounts] = useState([]);
   const [categoryIds, setCategoryIds] = useState([]);
   const [uploadedImageIds, setUploadedImageIds] = useState([]);
+  const [variantId, setVariantId] = useState([]);
   const [curProduct, setCurProduct] = useState();
   const accessToken = localStorage.getItem("accessToken");
 
@@ -78,7 +80,20 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     ? curProduct.images.map((img) => img.imageId) || []
     : [];
 
-  console.log("imageIds", imageIds);
+  const variantIds = Array.isArray(curProduct?.variants)
+    ? curProduct.variants.map((v) => v.id) || []
+    : [];
+
+  console.log("variantIds", variantIds);
+
+  const varId = Array.isArray(variantId)
+    ? variantId.map((v) => v?.id) || []
+    : [];
+
+  console.log("variant", varId);
+  console.log("hehe", variantId);
+
+  // console.log("imageIds", imageIds);
   // console.log("Image", Image);
   // console.log("fileListIds", fileListIds);
   // console.log("fileList", fileList);
@@ -98,7 +113,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     (index) => imageIds[index]
   );
 
-  console.log("deletedImageIds", deletedImageIds);
+  // console.log("deletedImageIds", deletedImageIds);
   console.log("-------------------------------------------------");
 
   // console.log("uploadedImageIds", uploadedImageIds);
@@ -145,6 +160,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
             }))
           : [],
         discount: curProduct.productDiscount || [],
+        variant: curProduct.variants || [],
         overview: curProduct.overview || "",
         description: curProduct.description || "",
       });
@@ -242,6 +258,10 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
 
     if (allValues.uploadedImageIds !== undefined) {
       setUploadedImageIds(allValues.uploadedImageIds);
+    }
+
+    if (allValues.variants !== undefined) {
+      setVariantId(allValues.variants);
     }
   };
 
@@ -450,6 +470,40 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
           await Promise.all(deletePromises);
         }
 
+        if (varId && variantIds) {
+          // Lọc ra các variant id cần xóa: có trong initialVariantIds nhưng không có trong currentVariantIds
+
+          const toDeleteVariant = variantIds.filter(
+            (id) => !varId.includes(id)
+          );
+
+          // console.log("toDeleteVariant", toDeleteVariant);
+
+          const notIdVariant = variantId.filter((variant) => !variant.id);
+          console.log("notIdVariant", notIdVariant);
+          if (toDeleteVariant.length > 0) {
+            // Tạo mảng các Promise để gọi API xóa từng variant
+            const deletePromises = toDeleteVariant.map((id) =>
+              variantService.deleteVariant(accessToken, id, curProduct.id)
+            );
+            await Promise.all(deletePromises);
+          }
+
+          if (notIdVariant.length > 0) {
+            // Tạo mảng các Promise để gọi API tạo từng variant
+            const createPromises = notIdVariant.map((variant) =>
+              variantService.createVariant(
+                accessToken,
+                curProduct.id,
+                variant.size,
+                Number(variant.quantity),
+                variant.price
+              )
+            );
+            await Promise.all(createPromises);
+          }
+        }
+
         // Cập nhật dữ liệu sản phẩm trước
         await dispatch(
           updateProduct({ accessToken, product: updatedFormData })
@@ -508,8 +562,8 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
               <>
                 <h3 className="text-lg font-semibold mb-2">Discount</h3>
                 {fields.map((field) => (
-                  <Row gutter={16} key={field.key}>
-                    <Col span={8}>
+                  <Row gutter={16} key={field.key} align="middle">
+                    <Col span={7}>
                       <Form.Item
                         {...field}
                         label="% giảm giá"
@@ -522,7 +576,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                         <Input type="number" placeholder="10" />
                       </Form.Item>
                     </Col>
-                    <Col span={8}>
+                    <Col span={7}>
                       <Form.Item
                         {...field}
                         label="Ngày bắt đầu"
@@ -539,7 +593,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                         />
                       </Form.Item>
                     </Col>
-                    <Col span={8}>
+                    <Col span={7}>
                       <Form.Item
                         {...field}
                         label="Ngày kết thúc"
@@ -554,6 +608,19 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                           style={{ width: "100%" }}
                         />
                       </Form.Item>
+                    </Col>
+                    <Col span={3}>
+                      <Button
+                        type="primary"
+                        danger
+                        icon={<Trash2 size={16} />}
+                        onClick={() => {
+                          console.log("Deleting discount with id:", field);
+                          remove(field.name);
+                        }}
+                      >
+                        Xóa
+                      </Button>
                     </Col>
                   </Row>
                 ))}
@@ -629,8 +696,8 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                   Thông tin biến thể
                 </h3>
                 {fields.map((field) => (
-                  <Row gutter={16} key={field.key}>
-                    <Col span={8}>
+                  <Row gutter={16} key={field.key} align="middle">
+                    <Col span={7}>
                       <Form.Item
                         {...field}
                         label="Size"
@@ -641,7 +708,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                         <Input />
                       </Form.Item>
                     </Col>
-                    <Col span={8}>
+                    <Col span={7}>
                       <Form.Item
                         {...field}
                         label="Số lượng"
@@ -652,7 +719,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                         <Input type="number" />
                       </Form.Item>
                     </Col>
-                    <Col span={8}>
+                    <Col span={7}>
                       <Form.Item
                         {...field}
                         label="Giá"
@@ -662,6 +729,19 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                       >
                         <Input type="number" />
                       </Form.Item>
+                    </Col>
+                    <Col span={3}>
+                      <Button
+                        type="primary"
+                        danger
+                        icon={<Trash2 size={16} />}
+                        onClick={() => {
+                          console.log("Deleting variant with id:", field.key);
+                          remove(field.name);
+                        }}
+                      >
+                        Xóa
+                      </Button>
                     </Col>
                   </Row>
                 ))}
@@ -676,6 +756,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
               </>
             )}
           </Form.List>
+
           <Form.Item name="id" hidden>
             <Input />
           </Form.Item>
