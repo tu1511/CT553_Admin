@@ -48,6 +48,33 @@ class variantService {
       throw error;
     }
   }
+
+  // update variant
+  async updateVariant(accessToken, id, productId, size, quantity, price) {
+    try {
+      const response = await this.api.put(
+        `/${id}`,
+        {
+          id,
+          size,
+          quantity,
+          price,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            productId,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update variant:", error);
+      throw error;
+    }
+  }
 }
 
 export default new variantService();

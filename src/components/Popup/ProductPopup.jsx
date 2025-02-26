@@ -154,10 +154,16 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
         completion: curProduct.completion || "",
         stone: curProduct.stone || "",
         variants: curProduct.variants
-          ? curProduct.variants.map((v) => ({
-              ...v,
-              price: v.price || v.priceHistory?.[0]?.price || 0,
-            }))
+          ? curProduct.variants.map((v) => {
+              // Tìm bản ghi giá hiện hành (endDate null)
+              const activePrice = v.priceHistory.find(
+                (ph) => ph.endDate === null
+              );
+              return {
+                ...v,
+                price: activePrice ? activePrice.price : v.price || 0,
+              };
+            })
           : [],
         discount: curProduct.productDiscount || [],
         variant: curProduct.variants || [],
@@ -501,6 +507,20 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
               )
             );
             await Promise.all(createPromises);
+          }
+
+          if (variantId) {
+            const updatePromises = variantId.map((variant) =>
+              variantService.updateVariant(
+                accessToken,
+                variant.id,
+                curProduct.id,
+                variant.size,
+                Number(variant.quantity),
+                variant.price
+              )
+            );
+            await Promise.all(updatePromises);
           }
         }
 
