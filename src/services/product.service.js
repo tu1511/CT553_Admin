@@ -107,6 +107,19 @@ class productService {
     return response.data;
   }
 
+  // delete product discount
+  async deleteProductDiscount(accessToken, discountId, productId) {
+    const response = await this.api.delete(`/${discountId}/discount`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params: {
+        productId,
+      },
+    });
+    return response.data;
+  }
+
   // create category for product
   async createCategoryForProduct(accessToken, productId, categoryId) {
     const response = await this.api.post(

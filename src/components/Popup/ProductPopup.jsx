@@ -84,14 +84,18 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     ? curProduct.variants.map((v) => v.id) || []
     : [];
 
-  console.log("variantIds", variantIds);
+  const discountIds = Array.isArray(curProduct?.productDiscount)
+    ? curProduct.productDiscount.map((d) => d.id) || []
+    : [];
+
+  // console.log("variantIds", variantIds);
 
   const varId = Array.isArray(variantId)
     ? variantId.map((v) => v?.id) || []
     : [];
 
-  console.log("variant", varId);
-  console.log("hehe", variantId);
+  // console.log("variant", varId);
+  // console.log("hehe", variantId);
 
   // console.log("imageIds", imageIds);
   // console.log("Image", Image);
@@ -113,12 +117,19 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     (index) => imageIds[index]
   );
 
+  const toDeleteDiscount = discountIds.filter(
+    (discountId) => !discounts.map((d) => d.id).includes(discountId)
+  );
+
   // console.log("deletedImageIds", deletedImageIds);
-  console.log("-------------------------------------------------");
 
   // console.log("uploadedImageIds", uploadedImageIds);
 
+  // console.log("discountIds", discountIds);
+
   // console.log("discounts", discounts);
+  // console.log("toDeleteDiscount", toDeleteDiscount);
+  // console.log("-------------------------------------------------");
   // console.log("curProduct", curProduct);
   //   console.log("cateIds", cateIds);
   // console.log("categoryIds", categoryIds);
@@ -346,7 +357,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
         } = formData;
 
         // Sau đó, nếu có discount cần cập nhật, gọi API updateDiscounts riêng
-        if (discounts && discounts.length > 0) {
+        if (discounts && discounts) {
           // Tách các discount đã có id và chưa có id
           const existingDiscounts = discounts.filter((d) => d.id);
           const newDiscounts = discounts.filter((d) => !d.id);
@@ -403,6 +414,17 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
                 ...discountPayload,
               })
             ).unwrap();
+          }
+
+          if (toDeleteDiscount.length) {
+            const deletePromises = toDeleteDiscount.map((discountId) =>
+              productService.deleteProductDiscount(
+                accessToken,
+                discountId,
+                curProduct.id
+              )
+            );
+            await Promise.all(deletePromises);
           }
           // toast.success("Discount đã được cập nhật và tạo mới thành công!");
         }
