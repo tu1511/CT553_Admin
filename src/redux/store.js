@@ -5,7 +5,7 @@ import { persistStore, persistReducer } from "redux-persist";
 import authSlice from "@redux/slices/authSlice";
 import productSlice from "@redux/slices/productSlide";
 import categorySlice from "@redux/slices/categorySlice";
-
+import orderSlice from "@redux/slices/orderSlice";
 import accountSlice from "@redux/slices/accountSlice";
 // import addressSlice from "@redux/slices/addressSlice";
 // import cartSlice from "@redux/slices/cartSlice";
@@ -21,6 +21,7 @@ const rootReducer = combineReducers({
   product: productSlice,
   category: categorySlice,
   account: accountSlice,
+  orders: orderSlice,
   // address: addressSlice,
   // cart: cartSlice,
 });

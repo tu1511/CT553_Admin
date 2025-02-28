@@ -53,6 +53,22 @@ const ProductPage = () => {
       ),
     },
     { title: "Tên sản phẩm", dataIndex: "name", key: "name" },
+    {
+      title: "Trạng thái",
+      dataIndex: "visible",
+      key: "visible",
+      render: (visible) => (
+        <span
+          className={
+            visible === true
+              ? "text-green-600 font-semibold"
+              : "text-red-500 font-semibold"
+          }
+        >
+          {visible ? "Hiển thị" : "Đã ẩn"}
+        </span>
+      ),
+    },
     { title: "Danh mục", dataIndex: "categoryName", key: "categoryName" },
     {
       title: "Giá",
@@ -73,6 +89,7 @@ const ProductPage = () => {
     ...product,
     key: product.id,
     categoryName: product?.categories?.[0]?.category?.name || "Chưa phân loại",
+    visible: product?.visible,
     productImage: product?.images[0]?.image?.path,
     price: product?.variants[0]?.price,
     quantity: product?.variants[0]?.quantity,

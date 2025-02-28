@@ -130,7 +130,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
   // console.log("discounts", discounts);
   // console.log("toDeleteDiscount", toDeleteDiscount);
   // console.log("-------------------------------------------------");
-  // console.log("curProduct", curProduct);
+  console.log("curProduct", curProduct);
   //   console.log("cateIds", cateIds);
   // console.log("categoryIds", categoryIds);
   // console.log("product", product);
@@ -597,6 +597,13 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
           </Form.Item>
           <Form.Item label="Slug" name="slug">
             <Input disabled />
+          </Form.Item>
+          {/* visible */}
+          <Form.Item label="Hiển thị" name="visible">
+            <Select>
+              <Select.Option value={true}>Hiển thị</Select.Option>
+              <Select.Option value={false}>Ẩn</Select.Option>
+            </Select>
           </Form.Item>
 
           <Form.List name="discounts">

@@ -12,7 +12,6 @@ const TableComponent = ({
   checkbox = true,
   handleSelected = () => {},
   onEdit = () => {},
-  onDelete = () => {},
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [filteredRows, setFilteredRows] = useState(rows);
@@ -115,16 +114,11 @@ const TableComponent = ({
       key: "actions",
       width: 120,
       render: (_, record) => (
-        <div className="flex gap-3">
+        <div className="flex justify-center space-x-2">
           <Edit
             size={20}
             className="text-blue-500 cursor-pointer hover:text-blue-700"
             onClick={() => onEdit(record)}
-          />
-          <Trash
-            size={20}
-            className="text-red-500 cursor-pointer hover:text-red-700"
-            onClick={() => onDelete(record)}
           />
         </div>
       ),
