@@ -6,6 +6,8 @@ import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 import { formatDateTime } from "@helpers/formatDateTime";
 import { toast } from "react-toastify";
 import orderService from "@services/order.service";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import OrderPDF from "@components/Popup/OrderPDF";
 
 const { Option } = Select;
 
@@ -250,6 +252,28 @@ const OrderPopup = ({ isOpen, onClose, data }) => {
               {toVietnamCurrencyFormat(orders.finalPrice)}
             </span>
           </div>
+        </div>
+      </div>
+      <div className="space-y-4 p-4" id="order-popup-content">
+        {/* Nội dung đơn hàng */}
+
+        <Divider />
+
+        {/* Nút Xuất PDF */}
+        <div className="flex justify-between">
+          <div className=""></div>
+          <PDFDownloadLink
+            document={<OrderPDF order={orders} />}
+            fileName={`don-hang-${orders?.id}.pdf`}
+          >
+            {({ loading }) =>
+              loading ? (
+                <Button loading>Đang tạo PDF...</Button>
+              ) : (
+                <Button type="primary">Xuất hóa đơn</Button>
+              )
+            }
+          </PDFDownloadLink>
         </div>
       </div>
     </Modal>
