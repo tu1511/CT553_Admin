@@ -85,6 +85,7 @@ const AccountPage = () => {
       dataIndex: "avatar",
       key: "avatar",
       align: "center",
+
       render: (avatar, record) => (
         <img
           src={

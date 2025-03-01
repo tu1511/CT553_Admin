@@ -1,4 +1,4 @@
-import { getAllOrder } from "@redux/thunk/orderThunk";
+import { getAllOrder, updateOrderStatus } from "@redux/thunk/orderThunk";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -33,7 +33,14 @@ const orderSlice = createSlice({
         setFulfilled(state);
         state.orders = action.payload?.metadata;
       })
-      .addCase(getAllOrder.rejected, setError);
+      .addCase(getAllOrder.rejected, setError)
+
+      .addCase(updateOrderStatus.pending, setLoading)
+      .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.orders = action.payload?.metadata;
+      })
+      .addCase(updateOrderStatus.rejected, setError);
   },
 });
 

@@ -1,14 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState, useMemo } from "react";
 import { Button, Modal, Tooltip } from "antd";
-import { deleteCategory, getCategories } from "@redux/thunk/categoryThunk";
-import CategoryPopup from "@components/Popup/CategoryPopup";
 import TableComponent from "@components/common/TableComponent";
-import { Plus } from "lucide-react";
-import { toast } from "react-toastify";
+// import { Plus } from "lucide-react";
+// import { toast } from "react-toastify";
 import { getAllOrder } from "@redux/thunk/orderThunk";
 import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 import { formatDate } from "@helpers/FormatDate";
+import OrderPopup from "@components/Popup/OrderPopup";
 
 const OrderPage = () => {
   const dispatch = useDispatch();
@@ -19,9 +18,6 @@ const OrderPage = () => {
 
   const accessToken = localStorage.getItem("accessToken");
 
-  // useEffect(() => {
-  //   dispatch(getCategories());
-  // }, [dispatch]);
   const { orders, loading } = useSelector((state) => state.orders);
 
   useEffect(() => {
@@ -31,7 +27,7 @@ const OrderPage = () => {
   console.log("Danh sách đơn hàng:", orders?.orders);
 
   const handleSelected = (selectedRowKeys) => {
-    const selectedData = flatCategories.filter((row) =>
+    const selectedData = orders.filter((row) =>
       selectedRowKeys.includes(row.id)
     );
     setSelectedRows(selectedData);
@@ -198,9 +194,11 @@ const OrderPage = () => {
       />
 
       {/* Popup Thêm / Cập nhật danh mục */}
-      <CategoryPopup
+      <OrderPopup
         isOpen={isUpdateModalOpen}
-        onClose={() => setIsUpdateModalOpen(false)}
+        onClose={() => {
+          setIsUpdateModalOpen(false);
+        }}
         data={selectedRows[0] || null}
       />
 

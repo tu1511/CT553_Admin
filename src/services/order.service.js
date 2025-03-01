@@ -54,6 +54,38 @@ class OrderService {
       console.error("Error getting all order:", error);
     }
   }
+
+  // get order by id
+  async getOrderById(accessToken, id) {
+    try {
+      const response = await this.api.get(`/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error getting order by id:", error);
+    }
+  }
+
+  // update order status
+  async updateOrderStatus(accessToken, orderId, fromStatus, toStatus) {
+    try {
+      const response = await this.api.put(
+        `/${orderId}/status`,
+        { fromStatus, toStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  }
 }
 
 export default new OrderService();

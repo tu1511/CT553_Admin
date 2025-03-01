@@ -13,3 +13,24 @@ export const getAllOrder = createAsyncThunk(
     }
   }
 );
+
+//update order status
+export const updateOrderStatus = createAsyncThunk(
+  "order/updateOrderStatus",
+  async (
+    { accessToken, orderId, fromStatus, toStatus },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await orderService.updateOrderStatus(
+        accessToken,
+        orderId,
+        fromStatus,
+        toStatus
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
