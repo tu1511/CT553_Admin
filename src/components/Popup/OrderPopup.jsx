@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, Select, Divider, Table, Button } from "antd";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getAllOrder, updateOrderStatus } from "@redux/thunk/orderThunk";
 import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 import { formatDateTime } from "@helpers/formatDateTime";
@@ -24,8 +24,7 @@ const OrderPopup = ({ isOpen, onClose, data }) => {
     const fetchData = async () => {
       try {
         const response = await orderService.getOrderById(accessToken, data.id);
-        console.log("Order data:", response);
-        setOrders(response?.metadata || {}); // Đảm bảo state không bị undefined
+        setOrders(response?.metadata); // Đảm bảo state không bị undefined
       } catch (error) {
         console.error("Error fetching order:", error);
       }
@@ -36,7 +35,7 @@ const OrderPopup = ({ isOpen, onClose, data }) => {
     }
   }, [accessToken, data?.id]);
 
-  console.log("order data:", orders);
+  // console.log("order data:", orders);
 
   const STATUS_MAP = [
     { id: 1, key: "AWAITING_CONFIRM", label: "Chờ xác nhận" },
@@ -252,9 +251,6 @@ const OrderPopup = ({ isOpen, onClose, data }) => {
             </span>
           </div>
         </div>
-      </div>
-      <div className="flex justify-end mt-4">
-        <Button type="primary">In hóa đơn</Button>
       </div>
     </Modal>
   );
