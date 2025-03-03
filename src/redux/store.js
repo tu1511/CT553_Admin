@@ -7,6 +7,7 @@ import productSlice from "@redux/slices/productSlide";
 import categorySlice from "@redux/slices/categorySlice";
 import orderSlice from "@redux/slices/orderSlice";
 import accountSlice from "@redux/slices/accountSlice";
+import couponSlice from "@redux/slices/couponSlide";
 // import addressSlice from "@redux/slices/addressSlice";
 // import cartSlice from "@redux/slices/cartSlice";
 
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
   category: categorySlice,
   account: accountSlice,
   orders: orderSlice,
+  coupon: couponSlice,
   // address: addressSlice,
   // cart: cartSlice,
 });

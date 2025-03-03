@@ -1,8 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
-import { HomeIcon, LayoutGrid, ShoppingCart, UserIcon } from "lucide-react";
+import {
+  Gift,
+  HomeIcon,
+  LayoutGrid,
+  ShoppingCart,
+  UserIcon,
+} from "lucide-react";
 import { CategoryPage, HomePage, OrderPage, ProductPage } from "@pages/index";
 import { element } from "prop-types";
 import AccountPage from "@pages/AccountPage";
+import CouponPage from "@pages/CouponPage";
 
 // Tạo component để lấy role người dùng và định nghĩa routes
 const useRoutes = () => {
@@ -73,6 +80,14 @@ const useRoutes = () => {
         //   element: <ProductTypePage />,
         // },
       ],
+    },
+    {
+      id: uuidv4(),
+      path: "/ma-giam-gia",
+      element: <CouponPage />,
+      icon: <Gift />,
+      label: "Quản lý mã giảm giá",
+      childItems: [],
     },
     {
       id: uuidv4(),
