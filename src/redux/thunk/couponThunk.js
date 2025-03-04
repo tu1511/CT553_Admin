@@ -12,3 +12,39 @@ export const getAllCoupons = createAsyncThunk(
     }
   }
 );
+
+export const createCoupon = createAsyncThunk(
+  "coupon/createCoupon",
+  async ({ accessToken, data }, { rejectWithValue }) => {
+    try {
+      const response = await couponService.create(accessToken, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const updateCoupon = createAsyncThunk(
+  "coupon/updateCoupon",
+  async ({ accessToken, couponId, data }, { rejectWithValue }) => {
+    try {
+      const response = await couponService.update(accessToken, couponId, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const deleteCoupon = createAsyncThunk(
+  "coupon/deleteCoupon",
+  async ({ accessToken, couponId }, { rejectWithValue }) => {
+    try {
+      const response = await couponService.delete(accessToken, couponId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);

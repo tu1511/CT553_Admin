@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { Button, Modal } from "antd";
 import { toast } from "react-toastify";
 import TableComponent from "@components/common/TableComponent";
-import PopupProduct from "@components/Popup/ProductPopup";
 import { Plus } from "lucide-react";
 import { getAllCoupons } from "@redux/thunk/couponThunk";
 import { formatDate } from "@helpers/FormatDate";
+import CouponPopup from "@components/Popup/CouponPopup";
 
 const CouponPage = () => {
   const dispatch = useDispatch();
@@ -39,8 +39,8 @@ const CouponPage = () => {
   const columns = [
     {
       title: "STT",
-      dataIndex: "key",
-      key: "key",
+      dataIndex: "stt",
+      key: "stt",
     },
     {
       title: "Mã giảm giá",
@@ -87,7 +87,8 @@ const CouponPage = () => {
     },
   ];
 
-  const rows = coupons?.map((coupon) => ({
+  const rows = coupons?.map((coupon, index) => ({
+    stt: index + 1, // Số thứ tự bắt đầu từ 1
     ...coupon,
     key: coupon.id,
     code: coupon.code,
@@ -146,12 +147,12 @@ const CouponPage = () => {
       </Modal>
       {/* Modal xác nhận cập nhật */}
 
-      <PopupProduct
+      <CouponPopup
         isOpen={isUpdateModalOpen}
         onClose={() => {
           setIsUpdateModalOpen(false);
         }}
-        product={editingCoupon}
+        data={editingCoupon}
       />
     </div>
   );

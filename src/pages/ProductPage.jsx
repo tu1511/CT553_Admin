@@ -35,6 +35,13 @@ const ProductPage = () => {
 
   const columns = [
     {
+      title: "STT",
+      dataIndex: "stt",
+      key: "stt",
+      width: 50,
+      align: "center",
+    },
+    {
       title: "Hình ảnh",
       dataIndex: "productImage",
       key: "productImage",
@@ -75,6 +82,7 @@ const ProductPage = () => {
       dataIndex: "price",
       key: "price",
       align: "right",
+      width: 120,
       render: (price) => `${Number(price).toLocaleString("vi-VN")} đ`,
     },
     {
@@ -82,10 +90,12 @@ const ProductPage = () => {
       dataIndex: "quantity",
       key: "quantity",
       align: "center",
+      width: 80,
     },
   ];
 
-  const rows = products?.products?.map((product) => ({
+  const rows = products?.products?.map((product, index) => ({
+    stt: index + 1,
     ...product,
     key: product.id,
     categoryName: product?.categories?.[0]?.category?.name || "Chưa phân loại",

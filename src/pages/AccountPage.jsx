@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState, useMemo } from "react";
-import { Modal, Select, Switch } from "antd";
+import { Avatar, Modal, Select, Switch } from "antd";
 import { toast } from "react-toastify";
 import { getAllAccount, toggleActiveAccount } from "@redux/thunk/accountThunk";
 import TableComponent from "@components/common/TableComponent";
@@ -81,6 +81,13 @@ const AccountPage = () => {
 
   const columns = [
     {
+      title: "STT",
+      dataIndex: "stt",
+      key: "stt",
+      align: "center",
+      width: 50,
+    },
+    {
       title: "Ảnh đại diện",
       dataIndex: "avatar",
       key: "avatar",
@@ -133,7 +140,8 @@ const AccountPage = () => {
 
   const dataSource = useMemo(
     () =>
-      account?.accounts?.map((acc) => ({
+      account?.accounts?.map((acc, index) => ({
+        stt: index + 1,
         key: acc.id,
         avatar: acc.avatar?.path,
         fullName: acc.fullName,
@@ -194,9 +202,21 @@ const AccountPage = () => {
         onOk={confirmUpdate}
         okText="Lưu thay đổi"
         cancelText="Hủy"
+        width={600}
       >
         {selectedAccount ? (
-          <div>
+          <div className="space-y-4">
+            <p>
+              <strong>Ảnh đại diện: </strong>
+              <Avatar
+                src={
+                  selectedAccount?.avatar?.path ||
+                  `https://ui-avatars.com/api/?name=${selectedAccount.fullName}&size=128`
+                }
+                size={80}
+                className="border border-gray-300"
+              />{" "}
+            </p>
             <p>
               <strong>Tên tài khoản:</strong> {selectedAccount.fullName}
             </p>

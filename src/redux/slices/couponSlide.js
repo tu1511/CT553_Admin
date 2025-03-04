@@ -1,4 +1,9 @@
-import { getAllCoupons } from "@redux/thunk/couponThunk";
+import {
+  createCoupon,
+  deleteCoupon,
+  getAllCoupons,
+  updateCoupon,
+} from "@redux/thunk/couponThunk";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -33,7 +38,22 @@ const couponSlice = createSlice({
         setFulfilled(state);
         state.coupons = action.payload?.metadata;
       })
-      .addCase(getAllCoupons.rejected, setError);
+      .addCase(getAllCoupons.rejected, setError)
+      .addCase(createCoupon.pending, setLoading)
+      .addCase(createCoupon.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.coupon = action.payload?.metadata;
+      })
+      .addCase(createCoupon.rejected, setError)
+      .addCase(updateCoupon.pending, setLoading)
+      .addCase(updateCoupon.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.coupon = action.payload?.metadata;
+      })
+      .addCase(updateCoupon.rejected, setError)
+      .addCase(deleteCoupon.pending, setLoading)
+      .addCase(deleteCoupon.fulfilled, setFulfilled)
+      .addCase(deleteCoupon.rejected, setError);
   },
 });
 

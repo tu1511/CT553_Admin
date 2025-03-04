@@ -4,6 +4,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createCategory,
+  deleteCategory,
   getCategories,
   updateCategory,
 } from "@redux/thunk/categoryThunk";
@@ -157,6 +158,23 @@ const CategoryPopup = ({ isOpen, onClose, data }) => {
         </Form.Item>
 
         <div style={{ textAlign: "right" }}>
+          {data && Object.keys(data).length !== 0 && (
+            <Button
+              type="primary"
+              danger
+              style={{ marginRight: 8 }}
+              onClick={async () => {
+                await dispatch(
+                  deleteCategory({ id: data._id, accessToken })
+                ).unwrap();
+                toast.success("Xóa danh mục thành công!");
+                dispatch(getCategories());
+                onClose();
+              }}
+            >
+              Xóa
+            </Button>
+          )}
           <Button onClick={onClose} style={{ marginRight: 8 }}>
             Hủy
           </Button>
