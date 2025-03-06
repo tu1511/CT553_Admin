@@ -1,32 +1,33 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { Button, Modal } from "antd";
+import { Button, Modal, Tooltip } from "antd";
 import { toast } from "react-toastify";
 import TableComponent from "@components/common/TableComponent";
 import { Plus } from "lucide-react";
-import { getAllCoupons } from "@redux/thunk/couponThunk";
 import { formatDate } from "@helpers/FormatDate";
-import CouponPopup from "@components/Popup/CouponPopup";
+import { getAllArticles } from "@redux/thunk/articleThunk";
+import ArticlePopup from "@components/Popup/ArticlePopup";
 
-const CouponPage = () => {
+const ArticlePage = () => {
   const dispatch = useDispatch();
-  const { coupons, loading } = useSelector((state) => state.coupon);
+  //   const { articles, loading } = useSelector((state) => state.coupon);
+  const { articles, loading } = useSelector((state) => state.article);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
-  const [editingCoupon, setEditingCoupon] = useState({});
+  const [editingArticle, setEditingArticle] = useState({});
   const accessToken = localStorage.getItem("accessToken");
   useEffect(() => {
-    dispatch(getAllCoupons(accessToken));
+    dispatch(getAllArticles(accessToken));
   }, [dispatch, accessToken]);
 
-  console.log("coupons", coupons);
+  console.log("articles", articles);
 
   const handleSelected = (keys) => {
-    const selected = coupons?.filter((coupon) => keys.includes(coupon.id));
+    const selected = articles?.filter((article) => keys.includes(article.id));
     setSelectedRowKeys(keys);
     setSelectedRows(selected);
   };
@@ -41,26 +42,48 @@ const CouponPage = () => {
       title: "STT",
       dataIndex: "stt",
       key: "stt",
+      width: 50,
     },
     {
-      title: "Mã giảm giá",
-      dataIndex: "code",
-      key: "code",
+      title: "Ảnh bìa",
+      dataIndex: "thumbnail",
+      align: "center",
+      key: "thumbnail",
+      width: 120,
+      render: (thumbnail) =>
+        thumbnail ? (
+          <Tooltip title={<img src={thumbnail} alt="Preview" width={150} />}>
+            <img
+              src={thumbnail}
+              alt="Thumbnail"
+              style={{
+                width: 50,
+                height: 50,
+                objectFit: "cover",
+                borderRadius: 4,
+              }}
+            />
+          </Tooltip>
+        ) : (
+          "Không có ảnh"
+        ),
     },
     {
-      title: "Phần trăm giảm",
-      dataIndex: "discountValue",
-      key: "discountValue",
+      title: "Tiêu đề",
+      dataIndex: "title",
+      key: "title",
     },
     {
-      title: "Số lượng",
-      dataIndex: "quantity",
-      key: "quantity",
+      title: "Tác giả",
+      dataIndex: "author",
+      key: "author",
     },
+
     {
       title: "Trạng thái",
       dataIndex: "visible",
       key: "visible",
+      width: 130,
       render: (visible) => (
         <span
           className={
@@ -74,29 +97,33 @@ const CouponPage = () => {
       ),
     },
     {
-      title: "Ngày bắt đầu",
-      dataIndex: "startDate",
-      key: "startDate",
-      render: (text) => <span>{formatDate(text)}</span>,
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: 150,
+      render: (date) => formatDate(date),
     },
     {
-      title: "Ngày kết thúc",
-      dataIndex: "endDate",
-      key: "endDate",
-      render: (text) => <span>{formatDate(text)}</span>,
+      title: "Ngày cập nhật",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      width: 160,
+      render: (date) => formatDate(date),
     },
   ];
 
-  const rows = coupons?.map((coupon, index) => ({
+  const rows = articles?.map((article, index) => ({
     stt: index + 1, // Số thứ tự bắt đầu từ 1
-    ...coupon,
-    key: coupon.id,
-    code: coupon.code,
-    discountValue: coupon.discountValue,
-    quantity: coupon.quantity,
-    visible: coupon.visible,
-    startDate: coupon.startDate,
-    endDate: coupon.endDate,
+    ...article,
+    key: article.id,
+    thumbnailImageId: article.thumbnailImageId,
+    thumbnail: article.thumbnailImage ? article.thumbnailImage.path : null,
+    title: article.title,
+    author: article.author,
+    content: article.content,
+    visible: article.visible,
+    createdAt: article.createdAt,
+    updatedAt: article.updatedAt,
   }));
 
   return (
@@ -107,17 +134,17 @@ const CouponPage = () => {
           type="primary"
           icon={<Plus size={28} />}
           onClick={() => {
-            setEditingCoupon({}); // Đối tượng rỗng cho chế độ tạo mới sản phẩm
+            setEditingArticle({}); // Đối tượng rỗng cho chế độ tạo mới sản phẩm
             setIsUpdateModalOpen(true);
           }}
         >
-          Thêm mã giảm giá
+          Thêm bài viết
         </Button>
       </div>
       <TableComponent
         loading={loading}
         onEdit={(record) => {
-          setEditingCoupon(record);
+          setEditingArticle(record);
           // console.log("Sửa sản phẩm:", record);
           setIsUpdateModalOpen(true);
         }}
@@ -147,15 +174,15 @@ const CouponPage = () => {
       </Modal>
       {/* Modal xác nhận cập nhật */}
 
-      <CouponPopup
+      <ArticlePopup
         isOpen={isUpdateModalOpen}
         onClose={() => {
           setIsUpdateModalOpen(false);
         }}
-        data={editingCoupon}
+        data={editingArticle}
       />
     </div>
   );
 };
 
-export default CouponPage;
+export default ArticlePage;

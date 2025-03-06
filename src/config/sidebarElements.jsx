@@ -3,6 +3,7 @@ import {
   Gift,
   HomeIcon,
   LayoutGrid,
+  Newspaper,
   ShoppingCart,
   UserIcon,
 } from "lucide-react";
@@ -10,6 +11,7 @@ import { CategoryPage, HomePage, OrderPage, ProductPage } from "@pages/index";
 import { element } from "prop-types";
 import AccountPage from "@pages/AccountPage";
 import CouponPage from "@pages/CouponPage";
+import ArticlePage from "@pages/ArticlePage";
 
 // Tạo component để lấy role người dùng và định nghĩa routes
 const useRoutes = () => {
@@ -95,6 +97,14 @@ const useRoutes = () => {
       element: <OrderPage />,
       icon: <ShoppingCart />,
       label: "Quản lý đơn hàng",
+      childItems: [],
+    },
+    {
+      id: uuidv4(),
+      path: "/bai-viet",
+      element: <ArticlePage />,
+      icon: <Newspaper />,
+      label: "Quản lý bài viết",
       childItems: [],
     },
     {
