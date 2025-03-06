@@ -13,18 +13,6 @@ export const getAllArticles = createAsyncThunk(
   }
 );
 
-export const getArticleById = createAsyncThunk(
-  "article/getArticleById",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await articleService.getArticleById(id);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
-  }
-);
-
 export const createArticle = createAsyncThunk(
   "article/createArticle",
   async ({ accessToken, data }, { rejectWithValue }) => {
@@ -39,9 +27,13 @@ export const createArticle = createAsyncThunk(
 
 export const updateArticle = createAsyncThunk(
   "article/updateArticle",
-  async (article, { rejectWithValue }) => {
+  async ({ accessToken, articleId, data }, { rejectWithValue }) => {
     try {
-      const response = await articleService.updateArticle(article._id, article);
+      const response = await articleService.update(
+        accessToken,
+        articleId,
+        data
+      );
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -51,10 +43,10 @@ export const updateArticle = createAsyncThunk(
 
 export const deleteArticle = createAsyncThunk(
   "article/deleteArticle",
-  async (id, { rejectWithValue }) => {
+  async ({ accessToken, articleId }, { rejectWithValue }) => {
     try {
-      await articleService.deleteArticle(id);
-      return id;
+      const response = await articleService.delete(accessToken, articleId);
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }

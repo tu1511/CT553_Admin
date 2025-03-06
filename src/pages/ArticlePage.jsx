@@ -24,8 +24,6 @@ const ArticlePage = () => {
     dispatch(getAllArticles(accessToken));
   }, [dispatch, accessToken]);
 
-  console.log("articles", articles);
-
   const handleSelected = (keys) => {
     const selected = articles?.filter((article) => keys.includes(article.id));
     setSelectedRowKeys(keys);
@@ -77,6 +75,7 @@ const ArticlePage = () => {
       title: "Tác giả",
       dataIndex: "author",
       key: "author",
+      width: 150,
     },
 
     {

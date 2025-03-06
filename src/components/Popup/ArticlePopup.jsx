@@ -11,7 +11,12 @@ import uploadService from "@services/upload.service";
 import { toast } from "react-toastify";
 import slugify from "slugify";
 import JoditEditor from "jodit-react";
-import { createArticle, getAllArticles } from "@redux/thunk/articleThunk";
+import {
+  createArticle,
+  deleteArticle,
+  getAllArticles,
+  updateArticle,
+} from "@redux/thunk/articleThunk";
 
 const ArticlePopup = ({ isOpen, onClose, data }) => {
   const dispatch = useDispatch();
@@ -30,8 +35,11 @@ const ArticlePopup = ({ isOpen, onClose, data }) => {
         content: data.content,
         visible: data.visible ?? false,
       });
+
       setFileList(
-        data.thumbnail ? [{ uid: data.thumbnailId, url: data.thumbnail }] : []
+        data.thumbnail
+          ? [{ uid: data?.thumbnailImageId, url: data?.thumbnail }]
+          : []
       );
     } else {
       form.resetFields();
@@ -71,9 +79,10 @@ const ArticlePopup = ({ isOpen, onClose, data }) => {
         content: values.content,
         visible: values.visible,
       };
+
       if (data && Object.keys(data).length !== 0) {
         await dispatch(
-          updateCategory({ id: data._id, data: formData })
+          updateArticle({ accessToken, articleId: data?.id, data: formData })
         ).unwrap();
         toast.success("Cập nhật bài viết thành công!");
       } else {
@@ -86,6 +95,7 @@ const ArticlePopup = ({ isOpen, onClose, data }) => {
       onClose();
     } catch (error) {
       toast.error("Lỗi khi gửi form");
+      console.log("Error", error);
     }
   };
 
@@ -158,6 +168,23 @@ const ArticlePopup = ({ isOpen, onClose, data }) => {
         </Form.Item>
 
         <div style={{ textAlign: "right" }}>
+          {data && Object.keys(data).length !== 0 && (
+            <Button
+              type="primary"
+              danger
+              style={{ marginRight: 8 }}
+              onClick={async () => {
+                await dispatch(
+                  deleteArticle({ accessToken, articleId: data.id })
+                ).unwrap();
+                toast.success("Xóa danh mục thành công!");
+                dispatch(getAllArticles());
+                onClose();
+              }}
+            >
+              Xóa
+            </Button>
+          )}
           <Button onClick={onClose} style={{ marginRight: 8 }}>
             Hủy
           </Button>

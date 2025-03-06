@@ -1,4 +1,9 @@
-import { createArticle, getAllArticles } from "@redux/thunk/articleThunk";
+import {
+  createArticle,
+  deleteArticle,
+  getAllArticles,
+  updateArticle,
+} from "@redux/thunk/articleThunk";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -37,41 +42,23 @@ const articleSlice = createSlice({
       .addCase(createArticle.pending, setLoading)
       .addCase(createArticle.fulfilled, (state, action) => {
         setFulfilled(state);
-        state.articles.push(action.payload);
+        state.articles.push(action.payload.metadata);
       })
-      .addCase(createArticle.rejected, setError);
-
-    //   .addCase(getArticleById.pending, setLoading)
-    //   .addCase(getArticleById.fulfilled, (state, action) => {
-    //     setFulfilled(state);
-    //     state.article = action.payload;
-    //   })
-    //   .addCase(getArticleById.rejected, setError)
-
-    //   .addCase(createArticle.pending, setLoading)
-    //   .addCase(createArticle.fulfilled, (state, action) => {
-    //     setFulfilled(state);
-    //     state.articles.push(action.payload);
-    //   })
-    //   .addCase(createArticle.rejected, setError)
-
-    //   .addCase(updateArticle.pending, setLoading)
-    //   .addCase(updateArticle.fulfilled, (state, action) => {
-    //     setFulfilled(state);
-    //     state.articles = state.articles.map((article) =>
-    //       article._id === action.payload._id ? action.payload : article
-    //     );
-    //   })
-    //   .addCase(updateArticle.rejected, setError)
-
-    //   .addCase(deleteArticle.pending, setLoading)
-    //   .addCase(deleteArticle.fulfilled, (state, action) => {
-    //     setFulfilled(state);
-    //     state.articles = state.articles.filter(
-    //       (article) => article._id !== action.payload
-    //     );
-    //   })
-    //   .addCase(deleteArticle.rejected, setError);
+      .addCase(createArticle.rejected, setError)
+      .addCase(updateArticle.pending, setLoading)
+      .addCase(updateArticle.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.article = action.payload.metadata;
+      })
+      .addCase(updateArticle.rejected, setError)
+      .addCase(deleteArticle.pending, setLoading)
+      .addCase(deleteArticle.fulfilled, (state, action) => {
+        setFulfilled(state);
+        state.articles = state.articles.filter(
+          (article) => article.id !== action.payload.metadata.id
+        );
+      })
+      .addCase(deleteArticle.rejected, setError);
   },
 });
 
