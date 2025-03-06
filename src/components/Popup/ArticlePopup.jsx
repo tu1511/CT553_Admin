@@ -144,24 +144,27 @@ const ArticlePopup = ({ isOpen, onClose, data }) => {
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Hiển thị" name="visible" valuePropName="checked">
-          <Switch />
-        </Form.Item>
 
-        <Form.Item label="Ảnh bìa">
-          <Upload
-            listType="picture-card"
-            fileList={fileList}
-            beforeUpload={(file) => {
-              handleUploadChange({ file });
-              return false;
-            }}
-            onRemove={() => setFileList([])}
-            maxCount={1}
-          >
-            {fileList.length === 0 && <UploadOutlined />}
-          </Upload>
-        </Form.Item>
+        <div className="flex space-x-10">
+          <Form.Item label="Ảnh bìa">
+            <Upload
+              listType="picture-card"
+              fileList={fileList}
+              beforeUpload={(file) => {
+                handleUploadChange({ file });
+                return false;
+              }}
+              onRemove={() => setFileList([])}
+              maxCount={1}
+            >
+              {fileList.length === 0 && <UploadOutlined />}
+            </Upload>
+          </Form.Item>
+
+          <Form.Item label="Hiển thị" name="visible" valuePropName="checked">
+            <Switch />
+          </Form.Item>
+        </div>
 
         <Form.Item label="Nội dung" name="content">
           <JoditEditor ref={editorRef} />

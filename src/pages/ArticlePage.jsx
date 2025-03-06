@@ -41,6 +41,7 @@ const ArticlePage = () => {
       dataIndex: "stt",
       key: "stt",
       width: 50,
+      align: "center",
     },
     {
       title: "Ảnh bìa",

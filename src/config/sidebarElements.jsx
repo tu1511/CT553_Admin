@@ -7,11 +7,11 @@ import {
   ShoppingCart,
   UserIcon,
 } from "lucide-react";
-import { CategoryPage, HomePage, OrderPage, ProductPage } from "@pages/index";
-import { element } from "prop-types";
+import { CategoryPage, OrderPage, ProductPage } from "@pages/index";
 import AccountPage from "@pages/AccountPage";
 import CouponPage from "@pages/CouponPage";
 import ArticlePage from "@pages/ArticlePage";
+import Dashboard from "@pages/Dashboard";
 
 // Tạo component để lấy role người dùng và định nghĩa routes
 const useRoutes = () => {
@@ -21,7 +21,7 @@ const useRoutes = () => {
     {
       id: uuidv4(),
       path: "/",
-      element: <HomePage />,
+      element: <Dashboard />,
       icon: <HomeIcon />,
       label: "Trang chủ",
       childItems: [],
