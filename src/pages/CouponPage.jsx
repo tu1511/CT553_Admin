@@ -41,6 +41,7 @@ const CouponPage = () => {
       title: "STT",
       dataIndex: "stt",
       key: "stt",
+      align: "center",
     },
     {
       title: "Mã giảm giá",

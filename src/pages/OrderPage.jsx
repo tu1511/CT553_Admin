@@ -98,7 +98,7 @@ const OrderPage = () => {
     () => [
       {
         title: "Mã đơn hàng",
-        dataIndex: "id",
+        dataIndex: "key",
         align: "center",
         width: 50,
         render: (text) => <span>#{text}</span>,

@@ -112,7 +112,7 @@ const TableComponent = ({
     {
       title: "Thao tác",
       key: "actions",
-      width: 120,
+      width: 100,
       render: (_, record) => (
         <div className="flex justify-center space-x-2">
           <Edit
