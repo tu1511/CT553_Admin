@@ -24,3 +24,15 @@ export const replyComment = createAsyncThunk(
     }
   }
 );
+
+export const toggleStatus = createAsyncThunk(
+  "review/toggleStatus",
+  async ({ accessToken, reviewId }, { rejectWithValue }) => {
+    try {
+      const response = await reviewService.toggleStatus(accessToken, reviewId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.data?.message);
+    }
+  }
+);

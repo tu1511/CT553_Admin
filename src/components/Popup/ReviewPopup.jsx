@@ -13,7 +13,11 @@ import {
 } from "antd";
 import { toast } from "react-toastify";
 import { formatDateTime } from "@helpers/formatDateTime";
-import { getAllReviews, replyComment } from "@redux/thunk/reviewThunk";
+import {
+  getAllReviews,
+  replyComment,
+  toggleStatus,
+} from "@redux/thunk/reviewThunk";
 import { useDispatch } from "react-redux";
 import { Plus } from "lucide-react";
 import uploadService from "@services/upload.service";
@@ -33,6 +37,8 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
       setVisible(data.visible);
     }
   }, [data]);
+
+  console.log("Dữ liệu đánh giá:", data);
 
   const handleImageUpload = async ({ file, fileList: newFileList }) => {
     if (file.status === "removed") {
@@ -106,19 +112,22 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
 
     onClose();
   };
+  const handleSwitchChange = async () => {
+    try {
+      await dispatch(
+        toggleStatus({ accessToken, reviewId: data?.id })
+      ).unwrap();
+      setVisible(!visible);
+      toast.success("Cập nhật trạng thái đánh giá thành công!");
+    } catch (error) {
+      console.error("Lỗi cập nhật trạng thái:", error);
+      toast.error("Cập nhật trạng thái đánh giá thất bại!");
+    }
 
-  const handleSwitchChange = (checked) => {
-    setVisible(checked);
-    console.log("Trạng thái hiển thị:", checked);
+    dispatch(getAllReviews(accessToken));
   };
 
   if (!data) return null;
-
-  console.log("fileList:", fileList);
-  console.log(
-    "hehe",
-    fileList.map((file) => file.uid)
-  );
 
   return (
     <Modal
@@ -130,7 +139,7 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
       open={isOpen}
       onCancel={onClose}
       footer={null}
-      width={800}
+      width={900}
     >
       {/* Người đánh giá */}
       <div className="flex justify-between items-center gap-4 mb-4">
@@ -153,7 +162,6 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
           <Switch checked={visible} onChange={handleSwitchChange} />
         </div>
       </div>
-
       <Divider dashed />
       {/* Thông tin đánh giá */}
       <div className="grid grid-cols-5 gap-2 text-gray-700">
@@ -165,7 +173,6 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
         <Text className="col-span-4">{data.productName}</Text>
       </div>
       <Divider dashed />
-
       {/* Điểm đánh giá */}
       <div className="flex items-center gap-2 mb-2">
         <Text strong style={{ fontSize: "15px" }}>
@@ -173,7 +180,6 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
         </Text>
         <Rate disabled value={data.rating} />
       </div>
-
       {/* Bình luận */}
       <Text strong>Bình luận:</Text>
       <Text
@@ -187,7 +193,6 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
       >
         {data.comment}
       </Text>
-
       {/* Hình ảnh đánh giá */}
       {data.reviewImage && data.reviewImage.length > 0 && (
         <div className="flex gap-3 my-4">
@@ -207,77 +212,90 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
         </div>
       )}
 
-      {
-        /* Phản hồi */
-        Array.isArray(data.replyByReview) && data.replyByReview.length > 0 && (
-          <>
-            <Divider dashed />
-            <Text strong>Phản hồi:</Text>
-            <div style={{ marginTop: 5 }}>
-              {data.replyByReview.map((reply, index) => (
-                <Text
-                  key={reply.id || index}
-                  style={{
-                    display: "block",
-                    marginBottom: 8,
-                    backgroundColor: "#f6f6f6",
-                    padding: "8px",
-                    borderRadius: "6px",
-                  }}
-                >
-                  {reply.comment}
-                </Text>
-              ))}
-            </div>
-          </>
-        )
-      }
-
-      {/* Nhập phản hồi */}
-
-      <Text strong>Trả lời đánh giá:</Text>
-      <Input.TextArea
-        rows={3}
-        placeholder="Nhập phản hồi của bạn..."
-        value={reply}
-        onChange={(e) => setReply(e.target.value)}
-        style={{
-          marginTop: 8,
-          borderRadius: 8,
-          padding: 10,
-          fontSize: "14px",
-        }}
-      />
-
-      {/* Tải ảnh lên */}
-      <div className="mt-2">
-        <Upload
-          listType="picture-card"
-          fileList={fileList}
-          beforeUpload={() => false}
-          onChange={handleImageUpload}
-          multiple
-        >
-          {fileList.length >= 8 ? null : (
-            <div>
-              <Plus />
-              <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
-            </div>
-          )}
-        </Upload>
-      </div>
-      <div className="flex justify-end mt-4 gap-2">
-        <Button onClick={onClose} style={{ borderRadius: 8 }}>
-          Hủy
-        </Button>
-        <Button
-          type="primary"
-          onClick={handleSubmit}
-          style={{ borderRadius: 8 }}
-        >
-          Gửi phản hồi
-        </Button>
-      </div>
+      {Array.isArray(data.replyByReview) && data.replyByReview.length > 0 ? (
+        <>
+          <Divider dashed />
+          <Text strong>Phản hồi:</Text>
+          <div style={{ marginTop: 1 }}>
+            {data.replyByReview.map((reply, index) => (
+              <Text
+                key={reply.id || index}
+                style={{
+                  display: "block",
+                  marginBottom: 8,
+                  backgroundColor: "#f6f6f6",
+                  padding: "8px",
+                  borderRadius: "6px",
+                }}
+              >
+                {reply.comment}
+              </Text>
+            ))}
+            {data?.replyByReview[0]?.reviewImage &&
+              data?.replyByReview[0]?.reviewImage?.length > 0 && (
+                <div className="flex gap-3 my-4">
+                  {data?.replyByReview[0]?.reviewImage.map((img) => (
+                    <Image
+                      key={img.id}
+                      src={img?.image?.path}
+                      alt="Hình ảnh đánh giá"
+                      style={{
+                        borderRadius: 10,
+                        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+                      }}
+                      width={100}
+                      height={100}
+                    />
+                  ))}
+                </div>
+              )}
+          </div>
+        </>
+      ) : (
+        <>
+          <Text strong>Trả lời đánh giá:</Text>
+          <Input.TextArea
+            rows={3}
+            placeholder="Nhập phản hồi của bạn..."
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            style={{
+              marginTop: 8,
+              borderRadius: 8,
+              padding: 10,
+              fontSize: "14px",
+            }}
+          />
+          <div className="mt-2">
+            <Upload
+              listType="picture-card"
+              fileList={fileList}
+              beforeUpload={() => false}
+              onChange={handleImageUpload}
+              multiple
+            >
+              {fileList.length >= 8 ? null : (
+                <div>
+                  <Plus />
+                  <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
+                </div>
+              )}
+            </Upload>
+          </div>
+          <div className="flex justify-end mt-4 gap-2">
+            <Button onClick={onClose} style={{ borderRadius: 8 }}>
+              Hủy
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              style={{ borderRadius: 8 }}
+            >
+              Gửi phản hồi
+            </Button>
+          </div>
+        </>
+      )}
     </Modal>
   );
 };

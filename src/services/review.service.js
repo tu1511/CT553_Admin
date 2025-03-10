@@ -23,6 +23,23 @@ class reviewService {
     });
     return response.data;
   }
+
+  // toggle status
+  async toggleStatus(accessToken, reviewId) {
+    const response = await this.api.put(
+      `/toggleHide/${reviewId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          reviewId,
+        },
+      }
+    );
+    return response.data;
+  }
 }
 
 export default new reviewService();

@@ -1,4 +1,8 @@
-import { getAllReviews, replyComment } from "@redux/thunk/reviewThunk";
+import {
+  getAllReviews,
+  replyComment,
+  toggleStatus,
+} from "@redux/thunk/reviewThunk";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -36,7 +40,10 @@ const reviewSlice = createSlice({
       .addCase(getAllReviews.rejected, setError)
       .addCase(replyComment.pending, setLoading)
       .addCase(replyComment.fulfilled, setFulfilled)
-      .addCase(replyComment.rejected, setError);
+      .addCase(replyComment.rejected, setError)
+      .addCase(toggleStatus.pending, setLoading)
+      .addCase(toggleStatus.fulfilled, setFulfilled)
+      .addCase(toggleStatus.rejected, setError);
   },
 });
 
