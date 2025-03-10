@@ -12,3 +12,15 @@ export const getAllReviews = createAsyncThunk(
     }
   }
 );
+
+export const replyComment = createAsyncThunk(
+  "review/replyComment",
+  async ({ accessToken, data }, { rejectWithValue }) => {
+    try {
+      const response = await reviewService.replyComment(accessToken, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.data?.message);
+    }
+  }
+);

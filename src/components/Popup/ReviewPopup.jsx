@@ -9,15 +9,23 @@ import {
   Image,
   Switch,
   Avatar,
+  Upload,
 } from "antd";
 import { toast } from "react-toastify";
 import { formatDateTime } from "@helpers/formatDateTime";
+import { getAllReviews, replyComment } from "@redux/thunk/reviewThunk";
+import { useDispatch } from "react-redux";
+import { Plus } from "lucide-react";
+import uploadService from "@services/upload.service";
 
 const { Title, Text } = Typography;
 
 const ReviewPopup = ({ isOpen, onClose, data }) => {
+  const dispatch = useDispatch();
+  const accessToken = localStorage.getItem("accessToken");
   const [reply, setReply] = useState("");
   const [visible, setVisible] = useState(data?.visible || true);
+  const [fileList, setFileList] = useState([]);
 
   useEffect(() => {
     if (data) {
@@ -26,13 +34,76 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
     }
   }, [data]);
 
-  const handleSubmit = async () => {
-    if (!reply.trim()) {
-      toast.error("Vui lòng nhập phản hồi!");
+  const handleImageUpload = async ({ file, fileList: newFileList }) => {
+    if (file.status === "removed") {
+      setFileList(newFileList);
       return;
     }
-    console.log("Dữ liệu gửi đi:", { reply });
-    toast.success("Trả lời đánh giá thành công!");
+
+    const toUpload = newFileList.filter((f) => f.originFileObj);
+    if (!toUpload.length) return setFileList(newFileList);
+
+    if (toUpload.some((file) => !file.type.startsWith("image/"))) {
+      return toast.error("Chỉ được phép tải lên ảnh!");
+    }
+
+    try {
+      const response = await uploadService.uploadImages(
+        toUpload.map((f) => f.originFileObj)
+      );
+      if (response?.metadata) {
+        const uploadedFiles = response.metadata.map((meta) => ({
+          uid: meta.id,
+          name: meta.filename || "image",
+          url: meta.path,
+        }));
+        setFileList([
+          ...newFileList.filter((f) => !f.originFileObj),
+          ...uploadedFiles,
+        ]);
+        toast.success("Tải ảnh lên thành công");
+      } else {
+        toast.error("Lỗi khi tải ảnh lên");
+      }
+    } catch (error) {
+      toast.error("Tải ảnh lên thất bại");
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!reply.trim()) {
+      toast.warning("Vui lòng nhập phản hồi!");
+      return;
+    }
+
+    const dataReply = {
+      orderId: data.orderId,
+      replyToReviewId: data.id,
+      comment: reply,
+      productId: data.productId,
+      variantId: data.variantId,
+      uploadedImageIds: fileList.map((file) => file.uid) || [],
+    };
+    console.log("Dữ liệu gửi đi:", dataReply);
+
+    // Gửi phản hồi
+    try {
+      await dispatch(replyComment({ accessToken, data: dataReply })).unwrap();
+      console.log("Gửi phản hồi thành công!");
+      toast.success("Trả lời đánh giá thành công!");
+      setReply("");
+      setFileList([]);
+    } catch (error) {
+      console.log("Lỗi trả lời đánh giá:", error);
+      if (error === "This review has already been replied") {
+        toast.error("Đánh giá này đã được trả lời rồi!");
+      } else {
+        toast.error("Có lỗi xảy ra khi trả lời đánh giá!");
+      }
+      return;
+    }
+    dispatch(getAllReviews(accessToken));
+
     onClose();
   };
 
@@ -42,6 +113,12 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
   };
 
   if (!data) return null;
+
+  console.log("fileList:", fileList);
+  console.log(
+    "hehe",
+    fileList.map((file) => file.uid)
+  );
 
   return (
     <Modal
@@ -84,7 +161,8 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
           Mã đơn hàng:
         </Text>{" "}
         <Text className="col-span-4">{data.orderId}</Text>
-        <Text strong>Sản phẩm:</Text> <Text>{data.productName}</Text>
+        <Text strong>Sản phẩm:</Text>{" "}
+        <Text className="col-span-4">{data.productName}</Text>
       </div>
       <Divider dashed />
 
@@ -112,7 +190,7 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
 
       {/* Hình ảnh đánh giá */}
       {data.reviewImage && data.reviewImage.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 my-4">
+        <div className="flex gap-3 my-4">
           {data.reviewImage.map((img) => (
             <Image
               key={img.id}
@@ -129,7 +207,34 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
         </div>
       )}
 
+      {
+        /* Phản hồi */
+        Array.isArray(data.replyByReview) && data.replyByReview.length > 0 && (
+          <>
+            <Divider dashed />
+            <Text strong>Phản hồi:</Text>
+            <div style={{ marginTop: 5 }}>
+              {data.replyByReview.map((reply, index) => (
+                <Text
+                  key={reply.id || index}
+                  style={{
+                    display: "block",
+                    marginBottom: 8,
+                    backgroundColor: "#f6f6f6",
+                    padding: "8px",
+                    borderRadius: "6px",
+                  }}
+                >
+                  {reply.comment}
+                </Text>
+              ))}
+            </div>
+          </>
+        )
+      }
+
       {/* Nhập phản hồi */}
+
       <Text strong>Trả lời đánh giá:</Text>
       <Input.TextArea
         rows={3}
@@ -143,6 +248,24 @@ const ReviewPopup = ({ isOpen, onClose, data }) => {
           fontSize: "14px",
         }}
       />
+
+      {/* Tải ảnh lên */}
+      <div className="mt-2">
+        <Upload
+          listType="picture-card"
+          fileList={fileList}
+          beforeUpload={() => false}
+          onChange={handleImageUpload}
+          multiple
+        >
+          {fileList.length >= 8 ? null : (
+            <div>
+              <Plus />
+              <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
+            </div>
+          )}
+        </Upload>
+      </div>
       <div className="flex justify-end mt-4 gap-2">
         <Button onClick={onClose} style={{ borderRadius: 8 }}>
           Hủy

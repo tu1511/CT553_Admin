@@ -1,4 +1,4 @@
-import { getAllReviews } from "@redux/thunk/reviewThunk";
+import { getAllReviews, replyComment } from "@redux/thunk/reviewThunk";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -33,7 +33,10 @@ const reviewSlice = createSlice({
         setFulfilled(state);
         state.reviews = action.payload?.metadata;
       })
-      .addCase(getAllReviews.rejected, setError);
+      .addCase(getAllReviews.rejected, setError)
+      .addCase(replyComment.pending, setLoading)
+      .addCase(replyComment.fulfilled, setFulfilled)
+      .addCase(replyComment.rejected, setError);
   },
 });
 

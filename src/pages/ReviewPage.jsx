@@ -23,7 +23,7 @@ const ReviewPage = () => {
     dispatch(getAllReviews(accessToken));
   }, [dispatch, accessToken]);
 
-  console.log("reviews:", reviews?.reviews);
+  // console.log("reviews:", reviews?.reviews);
 
   useEffect(() => {
     dispatch(getAllOrder({ accessToken, limit: 10, page: 1 }));
@@ -46,7 +46,7 @@ const ReviewPage = () => {
     rating: review.rating,
     comment: review.comment,
     visible: review.visible,
-    replyReview: review.replyReview,
+    replyByReview: review.replyByReview,
   }));
   const columns = useMemo(
     () => [
@@ -112,17 +112,17 @@ const ReviewPage = () => {
       },
       {
         title: "Phản hồi",
-        dataIndex: "replyReview",
+        dataIndex: "replyByReview",
         width: 150,
-        render: (text) => (
+        render: (replyByReview) => (
           <span
             className={
-              text === true
+              replyByReview?.length > 0
                 ? "text-green-500 bg-green-100 px-2 py-1 rounded-full font-semibold"
                 : "text-red-500 bg-red-100 px-2 py-1 rounded-full font-semibold"
             }
           >
-            {text ? "Đã phản hồi" : "Chưa phản hồi"}
+            {replyByReview?.length > 0 ? "Đã phản hồi" : "Chưa phản hồi"}
           </span>
         ),
       },

@@ -1,12 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Modal, Form, Input, Button, Upload, Switch } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  createCategory,
-  updateCategory,
-  getCategories,
-} from "@redux/thunk/categoryThunk";
+import { useDispatch } from "react-redux";
 import uploadService from "@services/upload.service";
 import { toast } from "react-toastify";
 import slugify from "slugify";
