@@ -1,3 +1,4 @@
+import { formatDate } from "@helpers/FormatDate";
 import { Card } from "antd";
 import {
   BarChart,
@@ -7,34 +8,43 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
-import dayjs from "dayjs";
 
-const generateFakeData = (timeRange) => {
-  const startDate = dayjs(timeRange.from);
-  const endDate = dayjs(timeRange.to);
-  const daysDiff = endDate.diff(startDate, "day");
-
-  return Array.from({ length: daysDiff + 1 }, (_, i) => {
-    return {
-      date: startDate.add(i, "day").format("DD"),
-      orders: Math.floor(Math.random() * 50) + 10,
-    };
-  });
-};
-
-const OrderChart = ({ timeRange }) => {
-  const data = generateFakeData(timeRange);
-
+const OrderChart = ({ data }) => {
+  const formattedData = data.map((item) => ({
+    ...item,
+    date: formatDate(item.date), // Định dạng ngày
+  }));
   return (
-    <Card title="Biểu đồ số đơn hàng" className="shadow-md">
+    <Card
+      title={`Đơn hàng từ ${formattedData[0]?.date} - ${
+        formattedData[formattedData.length - 1]?.date
+      }`}
+      className="shadow-md"
+    >
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
+        <BarChart data={formattedData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
-          <YAxis />
+          <YAxis allowDecimals={false} />
           <Tooltip />
-          <Bar dataKey="orders" fill="#8884d8" barSize={30} />
+          <Legend />
+          {/* Hai cột: Đã thanh toán và chưa thanh toán */}
+          <Bar
+            dataKey="totalAlreadyPaid"
+            stackId="a"
+            fill="#8884d8"
+            barSize={40}
+            name="Đã thanh toán"
+          />
+          <Bar
+            dataKey="totalUnpaid"
+            stackId="a"
+            fill="#82ca9d"
+            barSize={40}
+            name="Chưa thanh toán"
+          />
         </BarChart>
       </ResponsiveContainer>
     </Card>

@@ -1,46 +1,54 @@
+import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
+import { formatDate } from "@helpers/FormatDate";
 import { Card } from "antd";
 import {
-  LineChart,
-  Line,
+  AreaChart,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
+  Area,
 } from "recharts";
-import dayjs from "dayjs";
 
-const generateFakeData = (timeRange) => {
-  const startDate = dayjs(timeRange.from);
-  const endDate = dayjs(timeRange.to);
-  const daysDiff = endDate.diff(startDate, "day");
-
-  return Array.from({ length: daysDiff + 1 }, (_, i) => {
-    return {
-      date: startDate.add(i, "day").format("DD"),
-      revenue: Math.floor(Math.random() * 5000) + 500,
-    };
-  });
-};
-
-const RevenueChart = ({ timeRange }) => {
-  const data = generateFakeData(timeRange);
+const RevenueChart = ({ data }) => {
+  const formattedData = data.map((item) => ({
+    ...item,
+    date: formatDate(item.date), // Định dạng ngày
+  }));
 
   return (
-    <Card title="Biểu đồ doanh thu" className="shadow-md">
+    <Card
+      title={`Doanh thu từ ${formattedData[0]?.date} - ${
+        formattedData[formattedData.length - 1]?.date
+      }`}
+      className="shadow-md"
+    >
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
+        <AreaChart data={formattedData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Line
+          <YAxis width={80} tickFormatter={toVietnamCurrencyFormat} />
+          <Tooltip formatter={(value) => toVietnamCurrencyFormat(value)} />
+          <Legend />
+          <Area
             type="monotone"
-            dataKey="revenue"
-            stroke="#82ca9d"
-            strokeWidth={3}
+            dataKey="totalSales"
+            stroke="#8884d8"
+            fill="#8884d8"
+            strokeWidth={2}
+            name="Tổng doanh thu"
           />
-        </LineChart>
+          <Area
+            type="monotone"
+            dataKey="paidSales"
+            stroke="#82ca9d"
+            fill="#82ca9d"
+            strokeWidth={2}
+            name="Doanh thu đã thanh toán"
+          />
+        </AreaChart>
       </ResponsiveContainer>
     </Card>
   );

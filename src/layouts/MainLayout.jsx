@@ -73,14 +73,16 @@ const MainLayout = ({ children }) => {
   const currentPageName = currentPage.length > 0 ? currentPage[0] : null;
 
   return (
-    <div className="flex h-screen w-screen items-start justify-start">
-      <SideBar />
-      <div>
-        <Header currentPage={currentPageName} loggedInUserName="Minh tu" />
-        <div className="no-scrollbar absolute top-20 right-0 h-6/7 w-4/5 overflow-auto p-4 pb-0">
-          {children}
-          {/* <PrivateRoute>{children}</PrivateRoute> */}
-        </div>
+    <div className="flex h-screen w-screen">
+      {/* Sidebar chiếm chiều rộng cố định */}
+      <div className="w-[320px] h-full bg-slate-200 shadow-lg">
+        <SideBar />
+      </div>
+
+      {/* Nội dung chính */}
+      <div className="flex flex-col flex-1 h-full">
+        <Header currentPage={currentPageName} />
+        <div className="flex-1 overflow-auto p-4">{children}</div>
       </div>
     </div>
   );

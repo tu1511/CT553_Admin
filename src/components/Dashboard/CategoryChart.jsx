@@ -1,44 +1,54 @@
+import { formatDate } from "@helpers/FormatDate";
 import { Card } from "antd";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
-import { useEffect, useState } from "react";
-import dayjs from "dayjs";
 
-const generateCategoryData = (timeRange) => {
-  const { from, to } = timeRange;
-  const days = dayjs(to).diff(dayjs(from), "day") + 1;
-  const categories = ["Vợt", "Balo", "Áo", "Giày"];
+const shuffleColors = (colors) => [...colors].sort(() => Math.random() - 0.5);
 
-  return categories.map((category) => ({
-    category,
-    sales: Math.floor(Math.random() * 50 + 50) * days, // Số lượng bán thay đổi theo số ngày
-  }));
-};
-
-const CategoryChart = ({ timeRange }) => {
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    setData(generateCategoryData(timeRange));
-  }, [timeRange]);
-
+const CategoryChart = ({ data, startDate, endDate }) => {
+  const randomizedColors = shuffleColors([
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#4BC0C0",
+    "#9966FF",
+    "#FF9F40",
+    "#8D44AD",
+  ]);
   return (
-    <Card title="Thống kê loại sản phẩm bán ra" className="shadow-md">
+    <Card
+      title={`Danh mục sản phẩm bán ra từ ${formatDate(
+        startDate
+      )} - ${formatDate(endDate)}`}
+      className="shadow-md"
+    >
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="category" />
-          <YAxis />
+        <PieChart>
+          <Pie
+            data={data}
+            dataKey="quantity"
+            nameKey="categoryName"
+            cx="50%"
+            cy="50%"
+            outerRadius={100}
+            label={({ quantity }) => `${quantity} sản phẩm`}
+          >
+            {data.map((_, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={randomizedColors[index % randomizedColors.length]}
+              />
+            ))}
+          </Pie>
           <Tooltip />
-          <Bar dataKey="sales" fill="#FFA726" barSize={40} />
-        </BarChart>
+          <Legend />
+        </PieChart>
       </ResponsiveContainer>
     </Card>
   );

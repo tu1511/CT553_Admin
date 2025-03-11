@@ -18,10 +18,7 @@ const Logo = ({ ...props }) => {
 
   return (
     <div {...props}>
-      <Link
-        to={"/"}
-        className="flex w-full items-center justify-between px-6 pt-2"
-      >
+      <Link to={"/"} className="flex w-full items-center justify-between px-6">
         <img
           className="w-1/5 rounded-full"
           src="/src/assets/logo.png"

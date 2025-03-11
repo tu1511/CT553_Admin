@@ -86,6 +86,23 @@ class OrderService {
       console.error("Error updating order status:", error);
     }
   }
+
+  async getAllReport(accessToken, beginDate, endDate) {
+    try {
+      const response = await this.api.get("/allForReport", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          beginDate,
+          endDate,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error getting all report:", error);
+    }
+  }
 }
 
 export default new OrderService();

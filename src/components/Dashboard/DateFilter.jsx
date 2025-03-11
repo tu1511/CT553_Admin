@@ -37,9 +37,6 @@ const DateFilter = ({ setDateRange }) => {
     setDateRange({ from: from.startOf("day"), to: to.endOf("day") });
   }, [timeRange, customRange, setDateRange]);
 
-  console.log("DateFilter re-rendered", timeRange);
-  console.log("DateFilter re-rendered", customRange);
-
   return (
     <div className="flex justify-end items-center gap-4 mb-4">
       {/* Các nút thời gian mặc định */}

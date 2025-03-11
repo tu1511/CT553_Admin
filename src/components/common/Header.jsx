@@ -4,14 +4,14 @@ import PropTypes from "prop-types";
 import { UserCircle } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
-const Header = ({ currentPage, loggedInUserName }) => {
-  const dispatch = useDispatch();
+const Header = ({ currentPage }) => {
+  // const dispatch = useDispatch();
   const { account } = useSelector((state) => state.auth.authUser);
 
   console.log("account:", account);
 
   return (
-    <div className="absolute right-0 top-0 w-4/5 h-[75px] border-l bg-white shadow-md p-6 flex items-center justify-between">
+    <div className=" w-full h-[75px] border-l bg-white  border-slate-300 shadow-md py-6 px-10 flex items-center justify-between">
       {/* Tiêu đề trang */}
       <h2 className="text-2xl font-bold text-gray-800">{currentPage}</h2>
 

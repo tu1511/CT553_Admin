@@ -1,26 +1,8 @@
+import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 import { Card, Statistic } from "antd";
-import {
-  DollarSign,
-  ShoppingCart,
-  Package,
-  Users,
-  CircleDollarSign,
-} from "lucide-react";
+import { ShoppingCart, Package, Users, CircleDollarSign } from "lucide-react";
 
-const generateFakeData = (timeRange) => {
-  const multiplier = Math.random() * 0.5 + 0.75; // Dao động từ 0.75 - 1.25
-
-  return {
-    revenue: Math.round(12000000 * multiplier),
-    orders: Math.round(320 * multiplier),
-    productsSold: Math.round(1500 * multiplier),
-    users: Math.round(980 * multiplier),
-  };
-};
-
-const DashboardSummary = ({ timeRange }) => {
-  const { revenue, orders, productsSold, users } = generateFakeData(timeRange);
-
+const DashboardSummary = ({ revenue, orders, productsSold, users }) => {
   const cardStyle = "rounded-xl shadow-md p-4 transition-all hover:shadow-lg";
 
   return (
@@ -28,7 +10,7 @@ const DashboardSummary = ({ timeRange }) => {
       <Card className={cardStyle} style={{ background: "#f0fdfa" }}>
         <Statistic
           title="Doanh thu"
-          value={revenue}
+          value={toVietnamCurrencyFormat(revenue)}
           prefix={<CircleDollarSign className="text-green-500" />}
           valueStyle={{ color: "#10b981", fontWeight: "bold" }}
         />
@@ -51,7 +33,7 @@ const DashboardSummary = ({ timeRange }) => {
       </Card>
       <Card className={cardStyle} style={{ background: "#fef2f2" }}>
         <Statistic
-          title="Người dùng"
+          title="Số người dùng"
           value={users}
           prefix={<Users className="text-red-500" />}
           valueStyle={{ color: "#ef4444", fontWeight: "bold" }}
