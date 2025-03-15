@@ -19,7 +19,7 @@ const PaymentMethodChart = ({ data, startDate, endDate }) => {
   // Chuyển đổi số lượng thành phần trăm
   const formattedData = data.map((item) => ({
     paymentMethodName: item.paymentMethodName,
-    percentage: (item.quantity / totalQuantity) * 100, // Làm tròn 2 số thập phân
+    percentage: (item.quantity / totalQuantity) * 100,
   }));
 
   return (
@@ -38,7 +38,9 @@ const PaymentMethodChart = ({ data, startDate, endDate }) => {
             cx="50%"
             cy="50%"
             outerRadius={100}
-            label={({ name, percent }) => `${name}: ${percent * 100}%`} // Hiển thị % trực tiếp trên biểu đồ
+            label={({ name, percent }) =>
+              `${name}: ${(percent * 100).toFixed(2)}%`
+            } // Hiển thị % trực tiếp trên biểu đồ
           >
             {formattedData.map((_, index) => (
               <Cell

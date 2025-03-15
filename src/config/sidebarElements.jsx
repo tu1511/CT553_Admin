@@ -1,10 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import {
+  Component,
   Gift,
   HomeIcon,
   LayoutGrid,
   Newspaper,
   ShoppingCart,
+  Siren,
   Star,
   UserIcon,
 } from "lucide-react";
@@ -14,6 +16,7 @@ import CouponPage from "@pages/CouponPage";
 import ArticlePage from "@pages/ArticlePage";
 import Dashboard from "@pages/Dashboard";
 import ReviewPage from "@pages/ReviewPage";
+import PolicyPage from "@pages/PolicyPage";
 
 // Tạo component để lấy role người dùng và định nghĩa routes
 const useRoutes = () => {
@@ -30,60 +33,19 @@ const useRoutes = () => {
     },
     {
       id: uuidv4(),
+      path: "/danh-muc",
+      element: <CategoryPage />,
+      icon: <Component />,
+      label: "Quản lý danh mục",
+      childItems: [],
+    },
+    {
+      id: uuidv4(),
       path: "/san-pham",
       element: <ProductPage />,
       icon: <LayoutGrid />,
       label: "Quản lý Sản phẩm",
-      childItems: [
-        // {
-        //   childId: `${uuidv4()}-child`,
-        //   label: "Giảm giá",
-        //   path: "/discount",
-        //   element: <DiscountPage />,
-        // },
-        // {
-        //   childId: `${uuidv4()}-child`,
-        //   label: "Ưu đãi",
-        //   path: "/promotion",
-        //   element: <PromotionPage />,
-        // },
-        // {
-        //   childId: `${uuidv4()}-child`,
-        //   label: "Dịch vụ",
-        //   path: "/service",
-        //   element: <ServicePage />,
-        // },
-        // {
-        //   childId: `${uuidv4()}-child`,
-        //   label: "Voucher",
-        //   path: "/voucher",
-        //   element: <VoucherPage />,
-        // },
-        {
-          childId: `${uuidv4()}-child`,
-          label: "Danh mục",
-          path: "/danh-muc",
-          element: <CategoryPage />,
-        },
-        // {
-        //   childId: `${uuidv4()}-child`,
-        //   label: "Thương hiệu",
-        //   path: "/brand",
-        //   element: <BrandPage />,
-        // },
-        // {
-        //   childId: `${uuidv4()}-child`,
-        //   label: "Loại thông số",
-        //   path: "/specification",
-        //   element: <SpecificationPage />,
-        // },
-        // {
-        //   childId: `${uuidv4()}-child`,
-        //   label: "Loại sản phẩm",
-        //   path: "/product-type",
-        //   element: <ProductTypePage />,
-        // },
-      ],
+      childItems: [],
     },
     {
       id: uuidv4(),
@@ -103,6 +65,14 @@ const useRoutes = () => {
     },
     {
       id: uuidv4(),
+      path: "/danh-gia",
+      element: <ReviewPage />,
+      icon: <Star />,
+      label: "Quản lý đánh giá",
+      childItems: [],
+    },
+    {
+      id: uuidv4(),
       path: "/bai-viet",
       element: <ArticlePage />,
       icon: <Newspaper />,
@@ -111,10 +81,10 @@ const useRoutes = () => {
     },
     {
       id: uuidv4(),
-      path: "/danh-gia",
-      element: <ReviewPage />,
-      icon: <Star />,
-      label: "Quản lý đánh giá",
+      path: "/chinh-sach",
+      element: <PolicyPage />,
+      icon: <Siren />,
+      label: "Quản lý chính sách",
       childItems: [],
     },
     {
