@@ -1,13 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { Button, Modal, Tooltip } from "antd";
+import { Button, Modal } from "antd";
 import { toast } from "react-toastify";
 import TableComponent from "@components/common/TableComponent";
 import { Plus } from "lucide-react";
 import { formatDate } from "@helpers/FormatDate";
 import { getAllPolicies } from "@redux/thunk/policyThunk";
 import PolicyPopup from "@components/Popup/PolicyPopup";
-import { render } from "@react-pdf/renderer";
 
 const PolicyPage = () => {
   const dispatch = useDispatch();
@@ -53,10 +52,9 @@ const PolicyPage = () => {
       dataIndex: "content",
       key: "content",
       render: (content) => (
-        <span
-          className="line-clamp-1"
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
+        <span>
+          <span className="line-clamp-1">{content}</span>
+        </span>
       ),
     },
     {
