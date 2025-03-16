@@ -3,6 +3,7 @@ import {
   Component,
   Gift,
   HomeIcon,
+  Image,
   LayoutGrid,
   Newspaper,
   ShoppingCart,
@@ -17,6 +18,7 @@ import ArticlePage from "@pages/ArticlePage";
 import Dashboard from "@pages/Dashboard";
 import ReviewPage from "@pages/ReviewPage";
 import PolicyPage from "@pages/PolicyPage";
+import BannerPage from "@pages/BannerPage";
 
 // Tạo component để lấy role người dùng và định nghĩa routes
 const useRoutes = () => {
@@ -93,6 +95,14 @@ const useRoutes = () => {
       element: <AccountPage />,
       icon: <UserIcon />,
       label: "Quản lý tài khoản",
+      childItems: [],
+    },
+    {
+      id: uuidv4(),
+      path: "/banner",
+      element: <BannerPage />,
+      icon: <Image />,
+      label: "Quản lý banner",
       childItems: [],
     },
   ];

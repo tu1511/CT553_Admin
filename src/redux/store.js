@@ -11,6 +11,7 @@ import couponSlice from "@redux/slices/couponSlide";
 import articleSlice from "@redux/slices/articleSlice";
 import reviewSlice from "@redux/slices/reviewSlice";
 import policySlice from "@redux/slices/policySlice";
+import bannerSlice from "@redux/slices/bannerSlice";
 
 const persistConfig = {
   key: "root",
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
   article: articleSlice,
   reviews: reviewSlice,
   policies: policySlice,
+  banners: bannerSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

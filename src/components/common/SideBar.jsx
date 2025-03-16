@@ -21,9 +21,9 @@ const SideBar = () => {
       </div>
 
       {/* Sidebar Items */}
-      <div className="flex-1 overflow-y-auto">
-        <SideBarItemList />
-      </div>
+      {/* <div className="flex-1 overflow-y-auto"> */}
+      <SideBarItemList />
+      {/* </div> */}
 
       {/* Logout Button */}
       <div className="w-full border-t border-slate-300 p-4 bg-slate-200">

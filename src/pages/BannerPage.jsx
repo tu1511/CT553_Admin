@@ -5,25 +5,31 @@ import { toast } from "react-toastify";
 import TableComponent from "@components/common/TableComponent";
 import { Plus } from "lucide-react";
 import { formatDate } from "@helpers/FormatDate";
-import { getAllPolicies } from "@redux/thunk/policyThunk";
-import PolicyPopup from "@components/Popup/PolicyPopup";
+import { getAdminBanners } from "@redux/thunk/bannerThunk";
+import BannerPopup from "@components/Popup/BannerPopup";
+import { render } from "@react-pdf/renderer";
 
-const PolicyPage = () => {
+const BannerPage = () => {
   const dispatch = useDispatch();
-  const { policies, loading } = useSelector((state) => state.policies);
 
+  const { banners, loading } = useSelector((state) => state.banners);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
-  const [editingPolicy, setEditingPolicy] = useState({});
+  const [editingBanner, setEditingBanner] = useState({});
+  const accessToken = localStorage.getItem("accessToken");
   useEffect(() => {
-    dispatch(getAllPolicies());
-  }, [dispatch]);
+    dispatch(getAdminBanners(accessToken));
+  }, [dispatch, accessToken]);
+
+  console.log("Banners:", banners?.banners);
 
   const handleSelected = (keys) => {
-    const selected = policies?.filter((policy) => keys.includes(policy.id));
+    const selected = banners?.banners?.filter((banner) =>
+      keys.includes(banner.id)
+    );
     setSelectedRowKeys(keys);
     setSelectedRows(selected);
   };
@@ -40,23 +46,43 @@ const PolicyPage = () => {
       key: "stt",
       width: 50,
       align: "center",
+      render: (text) => <span className="font-semibold">#{text}</span>,
     },
     {
-      title: "Tiêu đề",
-      dataIndex: "title",
-      key: "title",
-      width: 230,
+      title: "Ảnh banner",
+      dataIndex: "image",
+      align: "center",
+      key: "image",
+      width: 300,
+      render: (image) =>
+        image ? (
+          <img
+            src={image}
+            alt="image"
+            style={{
+              width: 300,
+              height: 120,
+              objectFit: "cover",
+              borderRadius: 4,
+            }}
+          />
+        ) : (
+          "Không có ảnh"
+        ),
     },
-    // {
-    //   title: "Nội dung",
-    //   dataIndex: "content",
-    //   key: "content",
-    //   render: (content) => (
-    //     <span>
-    //       <span className="line-clamp-1">{content}</span>
-    //     </span>
-    //   ),
-    // },
+    {
+      title: "Tên banner",
+      dataIndex: "name",
+      key: "name",
+      width: 200,
+    },
+    {
+      title: "Thứ tự",
+      dataIndex: "priority",
+      key: "priority",
+      align: "center",
+      width: 100,
+    },
     {
       title: "Trạng thái",
       dataIndex: "visible",
@@ -75,30 +101,24 @@ const PolicyPage = () => {
       ),
     },
     {
-      title: "Ngày tạo",
+      title: "Ngày thêm",
       dataIndex: "createdAt",
       key: "createdAt",
       width: 150,
       render: (date) => formatDate(date),
     },
-    {
-      title: "Ngày cập nhật",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      width: 160,
-      render: (date) => formatDate(date),
-    },
   ];
 
-  const rows = policies?.map((policy, index) => ({
+  const rows = banners?.banners?.map((banner, index) => ({
     stt: index + 1, // Số thứ tự bắt đầu từ 1
-    ...policy,
-    key: policy.id,
-    title: policy.title,
-    content: policy.content,
-    visible: policy.visible,
-    createdAt: policy.createdAt,
-    updatedAt: policy.updatedAt,
+    ...banner,
+    key: banner.id,
+    imageId: banner.imageId,
+    image: banner.image ? banner.image?.path : null,
+    name: banner.name,
+    priority: banner.priority,
+    visible: banner.visible,
+    createdAt: banner.createdAt,
   }));
 
   return (
@@ -109,17 +129,17 @@ const PolicyPage = () => {
           type="primary"
           icon={<Plus size={28} />}
           onClick={() => {
-            setEditingPolicy({}); // Đối tượng rỗng cho chế độ tạo mới sản phẩm
+            setEditingBanner({}); // Đối tượng rỗng cho chế độ tạo mới sản phẩm
             setIsUpdateModalOpen(true);
           }}
         >
-          Thêm chính sách
+          Thêm banner
         </Button>
       </div>
       <TableComponent
         loading={loading}
         onEdit={(record) => {
-          setEditingPolicy(record);
+          setEditingBanner(record);
           // console.log("Sửa sản phẩm:", record);
           setIsUpdateModalOpen(true);
         }}
@@ -149,15 +169,15 @@ const PolicyPage = () => {
       </Modal>
       {/* Modal xác nhận cập nhật */}
 
-      <PolicyPopup
+      <BannerPopup
         isOpen={isUpdateModalOpen}
         onClose={() => {
           setIsUpdateModalOpen(false);
         }}
-        data={editingPolicy}
+        data={editingBanner}
       />
     </div>
   );
 };
 
-export default PolicyPage;
+export default BannerPage;
