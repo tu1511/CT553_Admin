@@ -45,7 +45,7 @@ export const updateBanner = createAsyncThunk(
       const response = await bannerService.update(accessToken, id, data);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error?.data?.message);
     }
   }
 );

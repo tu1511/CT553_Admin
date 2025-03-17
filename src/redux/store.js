@@ -12,6 +12,7 @@ import articleSlice from "@redux/slices/articleSlice";
 import reviewSlice from "@redux/slices/reviewSlice";
 import policySlice from "@redux/slices/policySlice";
 import bannerSlice from "@redux/slices/bannerSlice";
+import shopInfoSlice from "@redux/slices/shopInfoSlice";
 
 const persistConfig = {
   key: "root",
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   reviews: reviewSlice,
   policies: policySlice,
   banners: bannerSlice,
+  shopInfo: shopInfoSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

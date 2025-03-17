@@ -5,6 +5,7 @@ import {
   HomeIcon,
   Image,
   LayoutGrid,
+  MonitorCog,
   Newspaper,
   ShoppingCart,
   Siren,
@@ -19,6 +20,7 @@ import Dashboard from "@pages/Dashboard";
 import ReviewPage from "@pages/ReviewPage";
 import PolicyPage from "@pages/PolicyPage";
 import BannerPage from "@pages/BannerPage";
+import ShopInfoPage from "@pages/ShopInfoPage";
 
 // Tạo component để lấy role người dùng và định nghĩa routes
 const useRoutes = () => {
@@ -103,6 +105,14 @@ const useRoutes = () => {
       element: <BannerPage />,
       icon: <Image />,
       label: "Quản lý banner",
+      childItems: [],
+    },
+    {
+      id: uuidv4(),
+      path: "/thong-tin-cua-hang",
+      element: <ShopInfoPage />,
+      icon: <MonitorCog />,
+      label: "Quản lý thông tin của hàng",
       childItems: [],
     },
   ];

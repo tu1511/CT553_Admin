@@ -78,8 +78,11 @@ const BannerPopup = ({ isOpen, onClose, data }) => {
       setFileList([]);
       onClose();
     } catch (error) {
-      toast.error("Lỗi khi gửi form");
-      console.log("Error", error);
+      if (error === "Banner with this priority already exist") {
+        toast.warning("Độ ưu tiên đã tồn tại! Vui lòng chọn số khác");
+      } else {
+        toast.error("Lỗi khi gửi form");
+      }
     }
   };
 
