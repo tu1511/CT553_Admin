@@ -4,6 +4,7 @@ import { Avatar, Modal, Select, Switch } from "antd";
 import { toast } from "react-toastify";
 import { getAllAccount, toggleActiveAccount } from "@redux/thunk/accountThunk";
 import TableComponent from "@components/common/TableComponent";
+import { render } from "@react-pdf/renderer";
 
 const AccountPage = () => {
   const dispatch = useDispatch();
@@ -111,7 +112,12 @@ const AccountPage = () => {
     },
     { title: "Tên tài khoản", dataIndex: "fullName", key: "fullName" },
     { title: "Email", dataIndex: "email", key: "email" },
-    { title: "Số điện thoại", dataIndex: "phone", key: "phone" },
+    {
+      title: "Số điện thoại",
+      dataIndex: "phone",
+      key: "phone",
+      render: (phone) => <span>{phone || "Chưa cập nhật"}</span>,
+    },
     {
       title: "Trạng thái",
       dataIndex: "active",
@@ -202,7 +208,7 @@ const AccountPage = () => {
         onOk={confirmUpdate}
         okText="Lưu thay đổi"
         cancelText="Hủy"
-        width={600}
+        width={650}
       >
         {selectedAccount ? (
           <div className="space-y-4">
@@ -220,11 +226,17 @@ const AccountPage = () => {
             <p>
               <strong>Tên tài khoản:</strong> {selectedAccount.fullName}
             </p>
+
             <p>
               <strong>Email:</strong> {selectedAccount.email}
             </p>
             <p>
-              <strong>Số điện thoại:</strong> {selectedAccount.phone}
+              <strong>Phương thức đăng nhập:</strong>{" "}
+              {selectedAccount.isGoogleLogin ? "Google" : "Email"}
+            </p>
+            <p>
+              <strong>Số điện thoại:</strong>{" "}
+              {selectedAccount.phone || "Chưa cập nhật"}
             </p>
             <p>
               <strong>Trạng thái:</strong>{" "}

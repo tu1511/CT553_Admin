@@ -88,8 +88,6 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     ? curProduct.productDiscount.map((d) => d.id) || []
     : [];
 
-  // console.log("variantIds", variantIds);
-
   const varId = Array.isArray(variantId)
     ? variantId.map((v) => v?.id) || []
     : [];
@@ -121,6 +119,13 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     (discountId) => !discounts.map((d) => d.id).includes(discountId)
   );
 
+  // const toDeleteVariant = variantIds.filter(
+  //   (variantId) => !variantId.includes(variantId)
+  // );
+
+  // console.log("varId", varId);
+  // console.log("variantId", variantId);
+
   // console.log("deletedImageIds", deletedImageIds);
 
   // console.log("uploadedImageIds", uploadedImageIds);
@@ -130,7 +135,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
   // console.log("discounts", discounts);
   // console.log("toDeleteDiscount", toDeleteDiscount);
   // console.log("-------------------------------------------------");
-  console.log("curProduct", curProduct);
+  // console.log("curProduct", curProduct);
   //   console.log("cateIds", cateIds);
   // console.log("categoryIds", categoryIds);
   // console.log("product", product);
@@ -195,6 +200,13 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
         setDiscounts(discountData);
       } else {
         setDiscounts([]);
+      }
+
+      if (curProduct.variants && Array.isArray(curProduct.variants)) {
+        const initialVariantIds = curProduct.variants;
+        setVariantId(initialVariantIds);
+      } else {
+        setVariantId([]);
       }
 
       if (curProduct.categories && Array.isArray(curProduct.categories)) {
@@ -498,16 +510,16 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
           await Promise.all(deletePromises);
         }
 
-        if (varId && variantIds) {
-          // Lọc ra các variant id cần xóa: có trong initialVariantIds nhưng không có trong currentVariantIds
-
+        if (variantId && variantIds) {
           const toDeleteVariant = variantIds.filter(
-            (id) => !varId.includes(id)
+            (id) => !variantId.map((d) => d.id).includes(id)
           );
 
-          // console.log("toDeleteVariant", toDeleteVariant);
-
-          const notIdVariant = variantId.filter((variant) => !variant.id);
+          const notIdVariant = variantId.filter((variant) => !variant?.id);
+          console.log("variantId", variantId);
+          console.log("varId", varId);
+          console.log("variantIds", variantIds);
+          console.log("toDeleteVariant", toDeleteVariant);
           console.log("notIdVariant", notIdVariant);
           if (toDeleteVariant.length > 0) {
             // Tạo mảng các Promise để gọi API xóa từng variant
@@ -529,20 +541,23 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
               )
             );
             await Promise.all(createPromises);
-          }
+          } else {
+            if (variantId) {
+              const updatePromises = variantId.map((variant) => {
+                console.log("Variant:", variant); // Log từng variant trước khi gọi API
 
-          if (variantId) {
-            const updatePromises = variantId.map((variant) =>
-              variantService.updateVariant(
-                accessToken,
-                variant.id,
-                curProduct.id,
-                variant.size,
-                Number(variant.quantity),
-                variant.price
-              )
-            );
-            await Promise.all(updatePromises);
+                return variantService.updateVariant(
+                  accessToken,
+                  variant.id,
+                  curProduct.id,
+                  variant.size,
+                  Number(variant.quantity),
+                  variant.price ?? variant?.priceHistory[0]?.price
+                );
+              });
+
+              await Promise.all(updatePromises);
+            }
           }
         }
 

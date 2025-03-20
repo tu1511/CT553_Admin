@@ -7,9 +7,6 @@ class variantService {
 
   //   delete variant
   async deleteVariant(accessToken, variantId, productId) {
-    console.log("variantId", variantId);
-    console.log("productId", productId);
-
     try {
       const response = await this.api.delete(`/${variantId}`, {
         headers: {
