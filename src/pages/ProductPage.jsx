@@ -6,6 +6,7 @@ import TableComponent from "@components/common/TableComponent";
 import { getProducts } from "@redux/thunk/productThunk";
 import PopupProduct from "@components/Popup/ProductPopup";
 import { Plus } from "lucide-react";
+import { StarFilled } from "@ant-design/icons";
 
 const ProductPage = () => {
   const dispatch = useDispatch();
@@ -76,7 +77,7 @@ const ProductPage = () => {
         </span>
       ),
     },
-    { title: "Danh mục", dataIndex: "categoryName", key: "categoryName" },
+
     {
       title: "Giá",
       dataIndex: "price",
@@ -86,24 +87,52 @@ const ProductPage = () => {
       render: (price) => `${Number(price).toLocaleString("vi-VN")} đ`,
     },
     {
-      title: "Số lượng",
+      title: "Số lượng còn lại",
       dataIndex: "quantity",
       key: "quantity",
       align: "center",
+      width: 130,
+    },
+    {
+      title: "Đánh giá",
+      dataIndex: "rating",
+      key: "rating",
+      align: "center",
       width: 80,
+      render: (text) => (
+        <span className="flex items-center gap-1">
+          {text}
+
+          <StarFilled className="text-yellow-400 text-lg" />
+        </span>
+      ),
     },
   ];
+
+  const calculateAverageRating = (reviews = []) => {
+    const validReviews = reviews.filter(
+      (review) => review.rating !== null && review.rating !== undefined
+    );
+    if (validReviews.length === 0) return 0; // Mặc định 5 nếu không có rating hợp lệ
+    const totalRating = validReviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    return totalRating / validReviews.length;
+  };
 
   const rows = products?.products?.map((product, index) => ({
     stt: index + 1,
     ...product,
     key: product.id,
-    categoryName: product?.categories?.[0]?.category?.name || "Chưa phân loại",
     visible: product?.visible,
     productImage: product?.images[0]?.image?.path,
+    rating: calculateAverageRating(product?.reviews),
     price: product?.variants[0]?.price,
-    quantity: product?.variants[0]?.quantity,
+    quantity: product?.totalQuantity - product?.soldNumber,
   }));
+
+  console.log("products", products);
 
   return (
     <div>
