@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  getLoggedInUserThunk,
   loginThunk,
-  //   loginWithSocialThunk,
-  //   logoutThunk,
+  registerThunk,
 } from "@redux/thunk/authThunk";
 
 const initialState = {
@@ -27,9 +27,22 @@ const authSlice = createSlice({
       })
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.authUser = action.payload?.metadata;
+        state.authUser = action.payload?.metadata?.account;
       })
       .addCase(loginThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(getLoggedInUserThunk.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(getLoggedInUserThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.authUser = action.payload?.metadata;
+      })
+      .addCase(getLoggedInUserThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

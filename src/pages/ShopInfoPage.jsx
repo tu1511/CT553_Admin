@@ -137,7 +137,19 @@ const ShopInfoPage = () => {
           <Input.TextArea rows={4} />
         </Form.Item>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-4">
+          <Button
+            onClick={async () => {
+              try {
+                await dispatch(getInfo()).unwrap();
+              } catch (error) {
+                console.error("Error refreshing info:", error);
+              }
+            }}
+            style={{ marginRight: 8 }}
+          >
+            Hủy
+          </Button>
           <Button type="primary" htmlType="submit">
             Cập nhật thông tin
           </Button>

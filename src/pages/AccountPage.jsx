@@ -1,40 +1,43 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState, useMemo } from "react";
-import { Avatar, Modal, Select, Switch } from "antd";
+import { Avatar, Button, Modal, Select, Switch } from "antd";
 import { toast } from "react-toastify";
-import { getAllAccount, toggleActiveAccount } from "@redux/thunk/accountThunk";
+import { getAllAccount, updateAccountThunk } from "@redux/thunk/accountThunk";
 import TableComponent from "@components/common/TableComponent";
-import { render } from "@react-pdf/renderer";
+import { Plus } from "lucide-react";
+import AccountPopup from "@components/Popup/AccountPopup";
+import { getTagClass } from "@helpers/getTagClass";
 
 const AccountPage = () => {
   const dispatch = useDispatch();
   const { account, loading } = useSelector((state) => state.account);
 
+  const accessToken = localStorage.getItem("accessToken");
+
+  // console.log("Danh sách tài khoản:", account);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null); // State lưu tài khoản được chọn
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const accessToken = localStorage.getItem("accessToken");
+  const [isUpdateModaCreate, setIsUpdateModalCreate] = useState(false);
 
   useEffect(() => {
-    dispatch(getAllAccount({ limit: 10, page: -1, accessToken }));
+    dispatch(getAllAccount({ limit: 100, page: -1, accessToken }));
   }, [dispatch, accessToken]);
 
   // toggle active account
-  // const toggleActive = async () => {
-  //   if (!selectedAccount?.id) {
-  //     toast.error("Không tìm thấy tài khoản để cập nhật!");
-  //     return;
-  //   }
+  const toggleActive = async () => {
+    if (!selectedAccount?.id) {
+      toast.error("Không tìm thấy tài khoản để cập nhật!");
+      return;
+    }
 
-  //   console.log("ID tài khoản cần khóa/mở khóa:", selectedAccount.id);
-  //   dispatch(toggleActiveAccount({ id: selectedAccount.id }));
-  //   toast.success("Cập nhật trạng thái tài khoản thành công!");
-  // };
+    // Cập nhật UI trước khi dispatch action
+    setSelectedAccount((prev) => ({ ...prev, active: !prev.active }));
+  };
 
   const handleSelected = (keys) => {
-    console.log("Selected keys:", keys);
     setSelectedRowKeys(keys);
   };
 
@@ -45,7 +48,6 @@ const AccountPage = () => {
   };
 
   const confirmUpdate = async () => {
-    console.log("Cập nhật tài khoản:", selectedAccount);
     setIsUpdateModalOpen(false);
 
     if (!selectedAccount?.id) {
@@ -55,28 +57,23 @@ const AccountPage = () => {
 
     try {
       // Gọi API cập nhật trạng thái
-
       await dispatch(
-        toggleActiveAccount({ id: selectedAccount.id, accessToken })
+        updateAccountThunk({
+          id: selectedAccount.id,
+          data: {
+            roleId: selectedAccount.roleId,
+            active: selectedAccount.active,
+          },
+          accessToken,
+        })
       ).unwrap();
 
       // Gọi lại API để lấy dữ liệu mới
-      dispatch(getAllAccount({ limit: 10, page: -1, accessToken }));
+      dispatch(getAllAccount({ limit: 100, page: -1, accessToken }));
 
       toast.success("Cập nhật tài khoản thành công!");
     } catch (error) {
       toast.error("Lỗi khi cập nhật tài khoản!");
-    }
-  };
-
-  const getStatusClass = (status) => {
-    switch (status) {
-      case true: // Đang hoạt động
-        return "bg-green-100 text-green-800";
-      case false: // Đã khóa
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -86,7 +83,7 @@ const AccountPage = () => {
       dataIndex: "stt",
       key: "stt",
       align: "center",
-      width: 50,
+      width: 10,
     },
     {
       title: "Ảnh đại diện",
@@ -112,22 +109,18 @@ const AccountPage = () => {
     },
     { title: "Tên tài khoản", dataIndex: "fullName", key: "fullName" },
     { title: "Email", dataIndex: "email", key: "email" },
-    {
-      title: "Số điện thoại",
-      dataIndex: "phone",
-      key: "phone",
-      render: (phone) => <span>{phone || "Chưa cập nhật"}</span>,
-    },
+    // {
+    //   title: "Số điện thoại",
+    //   dataIndex: "phone",
+    //   key: "phone",
+    //   render: (phone) => <span>{phone || "Chưa cập nhật"}</span>,
+    // },
     {
       title: "Trạng thái",
       dataIndex: "active",
       key: "active",
       render: (active) => (
-        <span
-          className={`px-2 py-1 rounded-md text-sm font-medium ${getStatusClass(
-            active
-          )}`}
-        >
+        <span className={getTagClass(active ? "green" : "red")}>
           {active ? "Đang hoạt động" : "Đã khóa"}
         </span>
       ),
@@ -139,7 +132,15 @@ const AccountPage = () => {
       align: "center",
       render: (roleId) => {
         const roleMap = { 1: "Quản trị viên", 2: "Nhân viên", 3: "Khách hàng" };
-        return roleMap[roleId] || "Không xác định";
+        return (
+          <span
+            className={getTagClass(
+              roleId === 1 ? "green" : roleId === 2 ? "blue" : "yellow"
+            )}
+          >
+            {roleMap[roleId] || "Không xác định"}
+          </span>
+        );
       },
     },
   ];
@@ -161,13 +162,24 @@ const AccountPage = () => {
 
   return (
     <div>
+      <div className="flex justify-between items-center mb-4">
+        <div className=""></div>
+        <Button
+          type="primary"
+          icon={<Plus size={28} />}
+          onClick={() => {
+            setIsUpdateModalCreate(true);
+          }}
+        >
+          Tạo tài khoản
+        </Button>
+      </div>
       <TableComponent
         loading={loading}
         rows={dataSource}
         columns={columns}
         pagination={{ pageSize: 5 }}
         onEdit={(record) => {
-          console.log("Sửa tài khoản:", record);
           setSelectedRowKeys([record.key]);
           const accountToUpdate = account?.accounts?.find(
             (acc) => acc.id === record.key
@@ -177,7 +189,6 @@ const AccountPage = () => {
           setIsUpdateModalOpen(true);
         }}
         onDelete={(record) => {
-          console.log("Xóa tài khoản:", record);
           setSelectedRowKeys([record.key]);
           setIsDeleteModalOpen(true);
         }}
@@ -242,9 +253,7 @@ const AccountPage = () => {
               <strong>Trạng thái:</strong>{" "}
               <Switch
                 checked={selectedAccount.active}
-                onChange={(checked) => {
-                  setSelectedAccount({ ...selectedAccount, active: checked });
-                }}
+                onChange={toggleActive}
               />
               {selectedAccount?.active ? " Đang hoạt động" : " Đã khóa"}
             </p>
@@ -268,6 +277,13 @@ const AccountPage = () => {
           <p>Không có dữ liệu</p>
         )}
       </Modal>
+
+      <AccountPopup
+        isOpen={isUpdateModaCreate}
+        onClose={() => {
+          setIsUpdateModalCreate(false);
+        }}
+      />
     </div>
   );
 };

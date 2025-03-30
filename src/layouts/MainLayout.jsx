@@ -10,22 +10,6 @@ import SideBar from "@components/common/SideBar";
 // import PrivateRoute from "../configs/PrivateRoute";
 
 const MainLayout = ({ children }) => {
-  // const dispatch = useDispatch();
-  // const userExist = useSelector((state) => state.users?.user);
-
-  // useEffect(() => {
-  //   const accessToken = localStorage.getItem("accessToken");
-  //   const refreshToken = localStorage.getItem("refreshToken");
-
-  //   if (refreshToken && accessToken) {
-  //     dispatch(setCredentials({ accessToken, refreshToken }));
-  //   }
-
-  //   if (accessToken) {
-  //     dispatch(getLoggedInUser(accessToken));
-  //   }
-  // }, [dispatch]);
-
   const currentPath = useLocation().pathname;
   const pages = useRoutes();
 

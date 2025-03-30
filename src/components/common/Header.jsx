@@ -3,12 +3,32 @@ import NewOrderNotification from "@components/common/NewOrderNotification";
 import PropTypes from "prop-types";
 import { UserCircle } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { getLoggedInUserThunk } from "@redux/thunk/authThunk";
+import LoadingPage from "@pages/LoadingPage";
 
 const Header = ({ currentPage }) => {
-  // const dispatch = useDispatch();
-  const { account } = useSelector((state) => state.auth.authUser);
+  const accessToken = localStorage.getItem("accessToken");
 
-  console.log("account:", account);
+  const { authUser, loading } = useSelector((state) => state.auth);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (accessToken && !authUser) {
+      dispatch(getLoggedInUserThunk(accessToken));
+    }
+  }, [accessToken, dispatch, authUser]);
+
+  const [account, setAccount] = useState(null);
+
+  useEffect(() => {
+    if (authUser) {
+      setAccount(authUser);
+    }
+  }, [authUser]);
+
+  if (loading) return <LoadingPage />;
 
   return (
     <div className=" w-full h-[75px] border-l bg-white  border-slate-300 shadow-md py-6 px-10 flex items-center justify-between">

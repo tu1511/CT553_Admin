@@ -6,7 +6,7 @@ class authService {
   }
 
   async login(data) {
-    return this.api.post("/login", data);
+    return this.api.post("/adminLogin", data);
   }
 
   async register(data) {

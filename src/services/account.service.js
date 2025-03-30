@@ -28,13 +28,15 @@ class accountService {
     return response.data;
   }
 
-  async updateInformation(data, accessToken) {
-    const response = await this.api.put("/", data, {
+  //   permission
+  async updateAccount(id, data, accessToken) {
+    console.log("accessToken", accessToken);
+
+    const response = await this.api.put(`/${id}`, data, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log("Dữ liệu trả về từ API cập nhật:", response.data); // Kiểm tra API phản hồi
     return response.data;
   }
 
@@ -44,21 +46,6 @@ class accountService {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    return response.data;
-  }
-
-  // toggle account active
-  async toggleActive(id, accessToken) {
-    const response = await this.api.put(
-      `/toggleActive/${id}`,
-      {},
-
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
     return response.data;
   }
 }

@@ -1,10 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  updateUserInfoThunk,
   getLoggedInUser,
-  changePasswordThunk,
   getAllAccount,
-  toggleActiveAccount,
+  updateAccountThunk,
 } from "@redux/thunk/accountThunk";
 
 const accountSlice = createSlice({
@@ -42,41 +40,17 @@ const accountSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(changePasswordThunk.pending, (state) => {
+      .addCase(updateAccountThunk.pending, (state) => {
         state.loading = true;
         state.error = "";
       })
-      .addCase(changePasswordThunk.fulfilled, (state) => {
+      .addCase(updateAccountThunk.fulfilled, (state) => {
         state.loading = false;
       })
-      .addCase(changePasswordThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(toggleActiveAccount.pending, (state) => {
-        state.loading = true;
-        state.error = "";
-      })
-      .addCase(toggleActiveAccount.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(toggleActiveAccount.rejected, (state, action) => {
+      .addCase(updateAccountThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.metadata;
       });
-    builder.addCase(updateUserInfoThunk.pending, (state) => {
-      state.loading = true;
-      state.error = "";
-    });
-    builder.addCase(updateUserInfoThunk.fulfilled, (state, action) => {
-      state.loading = false;
-      state.account = action.payload.metadata;
-    });
-
-    builder.addCase(updateUserInfoThunk.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
   },
 });
 

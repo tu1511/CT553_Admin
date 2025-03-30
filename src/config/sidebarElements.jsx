@@ -21,10 +21,20 @@ import ReviewPage from "@pages/ReviewPage";
 import PolicyPage from "@pages/PolicyPage";
 import BannerPage from "@pages/BannerPage";
 import ShopInfoPage from "@pages/ShopInfoPage";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 // Tạo component để lấy role người dùng và định nghĩa routes
 const useRoutes = () => {
-  //   const userRole = useSelector((state) => state.users?.user?.role?.role);
+  const [account, setAccount] = useState(null);
+
+  const { authUser } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (authUser) {
+      setAccount(authUser);
+    }
+  }, [authUser]);
 
   const routes = [
     {
@@ -83,39 +93,44 @@ const useRoutes = () => {
       label: "Quản lý bài viết",
       childItems: [],
     },
-    {
-      id: uuidv4(),
-      path: "/chinh-sach",
-      element: <PolicyPage />,
-      icon: <Siren />,
-      label: "Quản lý chính sách",
-      childItems: [],
-    },
-    {
-      id: uuidv4(),
-      path: "/tai-khoan",
-      element: <AccountPage />,
-      icon: <UserIcon />,
-      label: "Quản lý tài khoản",
-      childItems: [],
-    },
-    {
-      id: uuidv4(),
-      path: "/banner",
-      element: <BannerPage />,
-      icon: <Image />,
-      label: "Quản lý banner",
-      childItems: [],
-    },
-    {
-      id: uuidv4(),
-      path: "/thong-tin-cua-hang",
-      element: <ShopInfoPage />,
-      icon: <MonitorCog />,
-      label: "Quản lý thông tin của hàng",
-      childItems: [],
-    },
   ];
+
+  if (account?.roleId === 1) {
+    routes.push(
+      {
+        id: uuidv4(),
+        path: "/chinh-sach",
+        element: <PolicyPage />,
+        icon: <Siren />,
+        label: "Quản lý chính sách",
+        childItems: [],
+      },
+      {
+        id: uuidv4(),
+        path: "/tai-khoan",
+        element: <AccountPage />,
+        icon: <UserIcon />,
+        label: "Quản lý tài khoản",
+        childItems: [],
+      },
+      {
+        id: uuidv4(),
+        path: "/banner",
+        element: <BannerPage />,
+        icon: <Image />,
+        label: "Quản lý banner",
+        childItems: [],
+      },
+      {
+        id: uuidv4(),
+        path: "/thong-tin-cua-hang",
+        element: <ShopInfoPage />,
+        icon: <MonitorCog />,
+        label: "Quản lý thông tin của hàng",
+        childItems: [],
+      }
+    );
+  }
 
   return routes;
 };

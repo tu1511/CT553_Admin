@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography } from "antd";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { loginThunk } from "@redux/thunk/authThunk"; // Import Redux thunk
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const LoginPage = () => {
   const [form] = Form.useForm();
@@ -28,15 +28,12 @@ const LoginPage = () => {
       navigate("/");
     } catch (error) {
       let message = "Đăng nhập không thành công!";
-
-      if (error.message === "Invalid credentials") {
+      if (error.message === "Not permission to access this account") {
+        message = "Bạn không có quyền truy cập vào hệ thống!";
+      } else if (error.message === "Invalid credentials") {
         message = "Email hoặc mật khẩu không đúng!";
       } else if (error.message === "Account is blocked") {
         message = "Tài khoản của bạn đã bị khóa!";
-      } else if (
-        error.message === "Bạn không có quyền truy cập vào hệ thống!"
-      ) {
-        message = "Bạn không có quyền truy cập vào hệ thống!";
       }
       toast.error(message);
     } finally {
@@ -104,16 +101,6 @@ const LoginPage = () => {
               </Button>
             </Form.Item>
           </Form>
-
-          {/* Link đăng ký */}
-          <div className="text-center">
-            <Text>
-              Chưa có tài khoản?{" "}
-              <Link to="/dang-ky" className="text-blue-500 hover:text-primary">
-                Đăng ký
-              </Link>
-            </Text>
-          </div>
         </div>
       </div>
     </div>

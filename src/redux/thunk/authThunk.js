@@ -1,4 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import accountService from "@services/account.service";
 import authService from "@services/auth.service";
 
 export const loginThunk = createAsyncThunk(
@@ -7,12 +8,6 @@ export const loginThunk = createAsyncThunk(
     try {
       const response = (await authService.login(credentials)).data;
 
-      const userRole = response?.metadata?.account?.role;
-      if (userRole === "USER") {
-        return rejectWithValue("Bạn không có quyền truy cập vào hệ thống!");
-      }
-
-      // Lưu access token và refresh token vào localStorage
       localStorage.setItem(
         "accessToken",
         response?.metadata.tokens.accessToken
@@ -26,44 +21,33 @@ export const loginThunk = createAsyncThunk(
   }
 );
 
-// export const loginWithSocialThunk = createAsyncThunk(
-//   "auth/loginWithSocial",
-//   async (credentials, { rejectWithValue }) => {
-//     try {
-//       const data = await authService.loginWithSocial(credentials);
+export const registerThunk = createAsyncThunk(
+  "auth/register",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await authService.register(data);
+      return response.data;
+    } catch (error) {
+      console.log("Lỗi khi đăng ký:", error.response.data.error);
+      return rejectWithValue(error.response.data.error);
+    }
+  }
+);
 
-//       // Lưu access token và refresh token vào localStorage
-//       localStorage.setItem("accessToken", data.data.accessToken);
-//       localStorage.setItem("refreshToken", data.data.refreshToken);
+export const getLoggedInUserThunk = createAsyncThunk(
+  "account/getLoggedInUser",
+  async (accessToken, { rejectWithValue }) => {
+    try {
+      const response = await accountService.getLoggedInUser(accessToken);
 
-//       return data.data;
-//     } catch (error) {
-//       return rejectWithValue(error.response.data.error);
-//     }
-//   }
-// );
-
-// export const logoutThunk = createAsyncThunk(
-//   "auth/logout",
-//   async (credentials, { rejectWithValue }) => {
-//     try {
-//       console.log(credentials);
-//       const response = await authService.logout(credentials);
-
-//       localStorage.removeItem("accessToken");
-//       localStorage.removeItem("refreshToken");
-//       localStorage.removeItem("loggedInUserId");
-//       // localStorage.removeItem(
-//       //   `viewedProducts_${localStorage.getItem("loggedInUserId")}`
-//       // );
-//       // localStorage.removeItem("productQuantity");
-//       // localStorage.removeItem("viewedProducts_null");
-
-//       window.location.reload();
-
-//       return response;
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data?.error || "Logout failed!");
-//     }
-//   }
-// );
+      console.log("response", response);
+      return response;
+    } catch (error) {
+      console.log(
+        "Lỗi khi lấy thông tin người dùng:",
+        error.response.data.error
+      );
+      return rejectWithValue(error.response.data.error);
+    }
+  }
+);

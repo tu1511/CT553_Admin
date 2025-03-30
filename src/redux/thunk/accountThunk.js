@@ -11,6 +11,7 @@ export const getAllAccount = createAsyncThunk(
         page,
         accessToken
       );
+
       return response;
     } catch (error) {
       return rejectWithValue(error.response.data.error);
@@ -60,14 +61,18 @@ export const changePasswordThunk = createAsyncThunk(
   }
 );
 
-export const toggleActiveAccount = createAsyncThunk(
-  "account/toggleActive",
-  async ({ id, accessToken }, { rejectWithValue }) => {
+export const updateAccountThunk = createAsyncThunk(
+  "account/updateAccount",
+  async ({ id, data, accessToken }, { rejectWithValue }) => {
     try {
-      const response = await accountService.toggleActive(id, accessToken);
+      const response = await accountService.updateAccount(
+        id,
+        data,
+        accessToken
+      );
       return response;
     } catch (error) {
-      return rejectWithValue(error.data?.message || "Cập nhật thất bại");
+      return rejectWithValue(error.response?.data || "Cập nhật thất bại");
     }
   }
 );
