@@ -40,6 +40,12 @@ class reviewService {
     );
     return response.data;
   }
+
+  async getUnsendReviews() {
+    const response = await this.api.get("/unsend");
+
+    return response.data;
+  }
 }
 
 export default new reviewService();

@@ -7,7 +7,7 @@ class productService {
 
   // Get all products
   async getProducts({ type, limit = -1 } = {}) {
-    const response = await this.api.get("/", {
+    const response = await this.api.get("/admin", {
       params: {
         type, // Bắt buộc (nếu thiếu sẽ bị lỗi "Product query type is missing!")
         limit, // Bắt buộc là số

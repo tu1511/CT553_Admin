@@ -12,8 +12,6 @@ import {
 const COLORS = ["#41AB5D", "#4292C6"]; // Xanh dương nhạt & xanh lá nhạt
 
 const PaymentMethodChart = ({ data, startDate, endDate }) => {
-  if (!data || data.length === 0) return null;
-
   const totalQuantity = data.reduce((sum, item) => sum + item.quantity, 0);
 
   // Chuyển đổi số lượng thành phần trăm

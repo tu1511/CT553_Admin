@@ -156,12 +156,6 @@ const ProductPage = () => {
           // console.log("Sửa sản phẩm:", record);
           setIsUpdateModalOpen(true);
         }}
-        onDelete={(record) => {
-          // console.log("xóa sản phẩm:", record);
-
-          setSelectedRowKeys([record.key]);
-          setIsDeleteModalOpen(true);
-        }}
         checkbox={false}
         rows={rows}
         columns={columns}

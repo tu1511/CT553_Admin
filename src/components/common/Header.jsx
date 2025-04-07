@@ -1,4 +1,3 @@
-import FeedbackNotification from "@components/common/FeedbackNotification";
 import NewOrderNotification from "@components/common/NewOrderNotification";
 import PropTypes from "prop-types";
 import { UserCircle } from "lucide-react";
@@ -6,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getLoggedInUserThunk } from "@redux/thunk/authThunk";
 import LoadingPage from "@pages/LoadingPage";
+import UnsendReviewsNotification from "@components/common/UnsendReviewsNotification";
 
 const Header = ({ currentPage }) => {
   const accessToken = localStorage.getItem("accessToken");
@@ -41,7 +41,7 @@ const Header = ({ currentPage }) => {
         <NewOrderNotification />
 
         {/* Thông báo phản hồi */}
-        <FeedbackNotification />
+        <UnsendReviewsNotification />
 
         {/* User Info */}
         <div className="flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-full shadow-sm">

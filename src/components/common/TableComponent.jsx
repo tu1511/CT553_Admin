@@ -1,5 +1,5 @@
 import { Table, Button, Input, Space } from "antd";
-import { FileSpreadsheet, Edit, Trash } from "lucide-react";
+import { FileSpreadsheet, Edit } from "lucide-react";
 import * as XLSX from "xlsx";
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
