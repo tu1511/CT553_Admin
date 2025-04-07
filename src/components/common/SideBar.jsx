@@ -10,7 +10,7 @@ const SideBar = () => {
 
   const logout = () => {
     localStorage.removeItem("accessToken");
-    navigate("/login");
+    navigate("/dang-nhap", { replace: true });
   };
 
   return (

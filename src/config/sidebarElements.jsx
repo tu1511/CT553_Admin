@@ -23,7 +23,12 @@ import BannerPage from "@pages/BannerPage";
 import ShopInfoPage from "@pages/ShopInfoPage";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
+const PrivateRoute = ({ children }) => {
+  const accessToken = localStorage.getItem("accessToken");
+  return accessToken ? children : <Navigate to="/dang-nhap" replace />;
+};
 // Tạo component để lấy role người dùng và định nghĩa routes
 const useRoutes = () => {
   const [account, setAccount] = useState(null);
@@ -40,7 +45,11 @@ const useRoutes = () => {
     {
       id: uuidv4(),
       path: "/",
-      element: <Dashboard />,
+      element: (
+        <PrivateRoute>
+          <Dashboard />
+        </PrivateRoute>
+      ),
       icon: <HomeIcon />,
       label: "Trang chủ",
       childItems: [],
@@ -48,7 +57,11 @@ const useRoutes = () => {
     {
       id: uuidv4(),
       path: "/danh-muc",
-      element: <CategoryPage />,
+      element: (
+        <PrivateRoute>
+          <CategoryPage />
+        </PrivateRoute>
+      ),
       icon: <Component />,
       label: "Quản lý danh mục",
       childItems: [],
@@ -56,7 +69,11 @@ const useRoutes = () => {
     {
       id: uuidv4(),
       path: "/san-pham",
-      element: <ProductPage />,
+      element: (
+        <PrivateRoute>
+          <ProductPage />
+        </PrivateRoute>
+      ),
       icon: <LayoutGrid />,
       label: "Quản lý Sản phẩm",
       childItems: [],
@@ -64,7 +81,11 @@ const useRoutes = () => {
     {
       id: uuidv4(),
       path: "/ma-giam-gia",
-      element: <CouponPage />,
+      element: (
+        <PrivateRoute>
+          <CouponPage />
+        </PrivateRoute>
+      ),
       icon: <Gift />,
       label: "Quản lý mã giảm giá",
       childItems: [],
@@ -72,7 +93,11 @@ const useRoutes = () => {
     {
       id: uuidv4(),
       path: "/don-hang",
-      element: <OrderPage />,
+      element: (
+        <PrivateRoute>
+          <OrderPage />
+        </PrivateRoute>
+      ),
       icon: <ShoppingCart />,
       label: "Quản lý đơn hàng",
       childItems: [],
@@ -80,7 +105,11 @@ const useRoutes = () => {
     {
       id: uuidv4(),
       path: "/danh-gia",
-      element: <ReviewPage />,
+      element: (
+        <PrivateRoute>
+          <ReviewPage />
+        </PrivateRoute>
+      ),
       icon: <Star />,
       label: "Quản lý đánh giá",
       childItems: [],
@@ -88,7 +117,11 @@ const useRoutes = () => {
     {
       id: uuidv4(),
       path: "/bai-viet",
-      element: <ArticlePage />,
+      element: (
+        <PrivateRoute>
+          <ArticlePage />
+        </PrivateRoute>
+      ),
       icon: <Newspaper />,
       label: "Quản lý bài viết",
       childItems: [],
@@ -100,7 +133,11 @@ const useRoutes = () => {
       {
         id: uuidv4(),
         path: "/chinh-sach",
-        element: <PolicyPage />,
+        element: (
+          <PrivateRoute>
+            <PolicyPage />
+          </PrivateRoute>
+        ),
         icon: <Siren />,
         label: "Quản lý chính sách",
         childItems: [],
@@ -108,7 +145,11 @@ const useRoutes = () => {
       {
         id: uuidv4(),
         path: "/tai-khoan",
-        element: <AccountPage />,
+        element: (
+          <PrivateRoute>
+            <AccountPage />
+          </PrivateRoute>
+        ),
         icon: <UserIcon />,
         label: "Quản lý tài khoản",
         childItems: [],
@@ -116,7 +157,11 @@ const useRoutes = () => {
       {
         id: uuidv4(),
         path: "/banner",
-        element: <BannerPage />,
+        element: (
+          <PrivateRoute>
+            <BannerPage />
+          </PrivateRoute>
+        ),
         icon: <Image />,
         label: "Quản lý banner",
         childItems: [],
@@ -124,7 +169,11 @@ const useRoutes = () => {
       {
         id: uuidv4(),
         path: "/thong-tin-cua-hang",
-        element: <ShopInfoPage />,
+        element: (
+          <PrivateRoute>
+            <ShopInfoPage />
+          </PrivateRoute>
+        ),
         icon: <MonitorCog />,
         label: "Quản lý thông tin của hàng",
         childItems: [],

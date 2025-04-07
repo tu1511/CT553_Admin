@@ -91,7 +91,7 @@ const UnsendReviewsNotification = () => {
       visible={isDropdownVisible}
       onVisibleChange={setDropdownVisible}
     >
-      <Badge count={unsendReviews.length} size="small">
+      <Badge count={unsendReviews.length} size="default">
         <Mail
           className="cursor-pointer text-gray-700 hover:text-blue-500"
           size={24}

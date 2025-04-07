@@ -103,6 +103,15 @@ class OrderService {
       console.error("Error getting all report:", error);
     }
   }
+
+  async getWaitingConfirmOrder() {
+    try {
+      const response = await this.api.get("/awaiting-confirm");
+      return response.data;
+    } catch (error) {
+      console.error("Error getting waiting confirm order:", error);
+    }
+  }
 }
 
 export default new OrderService();

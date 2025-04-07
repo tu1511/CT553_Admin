@@ -8,57 +8,26 @@ import {
   MapPin,
   CreditCard,
 } from "lucide-react";
-
-const fakeOrders = [
-  {
-    _id: "1",
-    user: { fullname: "Nguyễn Văn A" },
-    orderDate: "2024-02-19",
-    totalPrice: 1500000,
-    shippingAddress: {
-      fullname: "Nguyễn Văn A",
-      phone: "0123456789",
-      province: "Hà Nội",
-      district: "Ba Đình",
-    },
-    paymentMethod: { paymentMethodName: "Thanh toán khi nhận hàng" },
-  },
-  {
-    _id: "2",
-    user: { fullname: "Trần Thị B" },
-    orderDate: "2024-02-18",
-    totalPrice: 2250000,
-    shippingAddress: {
-      fullname: "Trần Thị B",
-      phone: "0987654321",
-      province: "TP HCM",
-      district: "Quận 1",
-    },
-    paymentMethod: { paymentMethodName: "Chuyển khoản" },
-  },
-  {
-    _id: "3",
-    user: { fullname: "Lê Văn C" },
-    orderDate: "2024-02-17",
-    totalPrice: 3200000,
-    shippingAddress: {
-      fullname: "Lê Văn C",
-      phone: "0912345678",
-      province: "Đà Nẵng",
-      district: "Hải Châu",
-    },
-    paymentMethod: { paymentMethodName: "Ví điện tử" },
-  },
-];
+import { useNavigate } from "react-router-dom";
+import orderService from "@services/order.service";
+import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
+import { formatDate } from "@helpers/FormatDate";
 
 const NewOrderNotification = () => {
   const [newOrders, setNewOrders] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Giả lập việc lấy đơn hàng mới
-    setTimeout(() => {
-      setNewOrders(fakeOrders);
-    }, 1000);
+    const fetchOrders = async () => {
+      try {
+        const response = await orderService.getWaitingConfirmOrder();
+        setNewOrders(response?.metadata || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách đơn hàng:", error);
+      }
+    };
+
+    fetchOrders();
   }, []);
 
   const menuItems = (
@@ -72,29 +41,31 @@ const NewOrderNotification = () => {
               <List.Item.Meta
                 avatar={<Avatar icon={<User />} />}
                 title={
-                  <span className="font-semibold">{order.user.fullname}</span>
+                  <span className="font-semibold">
+                    {order?.buyer?.fullName ?? "Khách hàng"}
+                  </span>
                 }
                 description={
                   <div className="text-sm text-gray-600">
                     <div className="flex items-center justify-between gap-2">
                       <p className="flex items-center gap-1">
                         <Calendar size={16} className="text-blue-500" />{" "}
-                        {order.orderDate}
+                        {formatDate(order?.createdAt)}
                       </p>
                       <p className="flex items-center gap-1">
                         <DollarSign size={16} className="text-green-500" />{" "}
-                        {order.totalPrice.toLocaleString()} VND
+                        {toVietnamCurrencyFormat(order?.finalPrice)}
                       </p>
                     </div>
 
                     <p className="flex items-center gap-1">
                       <MapPin size={16} className="text-red-500" />{" "}
-                      {order.shippingAddress.province},{" "}
-                      {order.shippingAddress.district}
+                      {order?.deliveryAddress?.provinceName ?? "?"},{" "}
+                      {order?.deliveryAddress?.districtName ?? "?"}
                     </p>
                     <p className="flex items-center gap-1">
                       <CreditCard size={16} className="text-yellow-500" />{" "}
-                      {order.paymentMethod.paymentMethodName}
+                      {order?.payment?.paymentMethod?.name ?? "?"}
                     </p>
                   </div>
                 }
@@ -107,8 +78,13 @@ const NewOrderNotification = () => {
       )}
 
       {newOrders.length > 3 && (
-        <Button type="link" block className="mt-2 text-blue-500">
-          Xem chi tiết
+        <Button
+          type="link"
+          block
+          className="mt-2 text-blue-500"
+          onClick={() => navigate("/don-hang")}
+        >
+          Xem tất cả đơn chờ xác nhận
         </Button>
       )}
     </div>
@@ -116,7 +92,7 @@ const NewOrderNotification = () => {
 
   return (
     <Dropdown overlay={menuItems} trigger={["click"]} placement="bottomRight">
-      <Badge count={newOrders.length} size="small">
+      <Badge count={newOrders.length} size="default">
         <Bell
           className="cursor-pointer text-gray-700 hover:text-blue-500"
           size={24}

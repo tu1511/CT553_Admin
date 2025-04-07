@@ -132,8 +132,6 @@ const ProductPage = () => {
     quantity: product?.totalQuantity - product?.soldNumber,
   }));
 
-  console.log("products", products);
-
   return (
     <div>
       <div className="flex justify-between items-center mb-4">

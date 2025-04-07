@@ -21,7 +21,7 @@ const OrderPage = () => {
   const { orders, loading } = useSelector((state) => state.orders);
 
   useEffect(() => {
-    dispatch(getAllOrder({ accessToken, limit: 10, page: 1 }));
+    dispatch(getAllOrder({ accessToken, limit: 300, page: 1 }));
   }, [dispatch, accessToken]);
 
   console.log("Danh sách đơn hàng:", orders?.orders);

@@ -53,15 +53,6 @@ const OrderPopup = ({ isOpen, onClose, data }) => {
     FAILED: "Thất bại",
   };
 
-  // const statusClasses = {
-  //   AWAITING_CONFIRM: "text-gray-600 bg-gray-200 px-2 py-1 rounded-full",
-  //   AWAITING_FULFILLMENT:
-  //     "text-yellow-500 bg-yellow-100 px-2 py-1 rounded-full",
-  //   DELIVERING: "text-blue-500 bg-blue-100 px-2 py-1 rounded-full",
-  //   DELIVERED: "text-green-500 bg-green-100 px-2 py-1 rounded-full",
-  //   CANCELED: "text-red-500 bg-red-100 px-2 py-1 rounded-full",
-  // };
-
   const statusPaymentClasses = {
     PENDING: "text-blue-500 bg-blue-100 px-2 py-1 rounded-full",
     SUCCESS: "text-green-500 bg-green-100 px-2 py-1 rounded-full",
@@ -88,23 +79,38 @@ const OrderPopup = ({ isOpen, onClose, data }) => {
     }
   }, [orders]);
 
-  const handleStatusChange = (newStatus) => {
+  const handleStatusChange = async (newStatus) => {
+    if (!orders?.id || !orders?.currentStatus?.id) {
+      toast.error("Thông tin đơn hàng không hợp lệ!");
+      return;
+    }
+
+    const currentStatus = orders.currentStatus.name?.toUpperCase();
+    if (currentStatus === "DELIVERED" || currentStatus === "CANCELED") {
+      toast.warning(
+        "Không thể thay đổi trạng thái của đơn hàng đã hoàn tất hoặc đã huỷ!"
+      );
+      return;
+    }
+
     setSelectedStatus(newStatus);
-    dispatch(
-      updateOrderStatus({
-        accessToken,
-        orderId: orders.id,
-        fromStatus: orders.currentStatus.id,
-        toStatus: newStatus,
-      })
-    )
-      .then(() => {
-        toast.success("Cập nhật trạng thái đơn hàng thành công!");
-        dispatch(getAllOrder({ accessToken, limit: 10, page: 1 }));
-      })
-      .catch(() => {
-        toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
-      });
+
+    try {
+      await dispatch(
+        updateOrderStatus({
+          accessToken,
+          orderId: orders.id,
+          fromStatus: orders.currentStatus.id,
+          toStatus: newStatus,
+        })
+      ).unwrap();
+
+      toast.success("Cập nhật trạng thái đơn hàng thành công!");
+      dispatch(getAllOrder({ accessToken, limit: 300, page: 1 }));
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
+      console.error("Update status error:", error);
+    }
   };
 
   return (

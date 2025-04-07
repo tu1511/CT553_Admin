@@ -11,7 +11,7 @@ import {
   Upload,
   DatePicker,
 } from "antd";
-import { Eye, Edit, Plus, Trash2 } from "lucide-react";
+import { Eye, Edit, Plus, Trash2, BadgeAlert } from "lucide-react";
 import slugify from "slugify";
 import DescriptionPopup from "@components/Popup/DescriptionPopup";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +32,7 @@ import { toast } from "react-toastify";
 import uploadService from "@services/upload.service";
 import productService from "@services/product.service";
 import variantService from "@services/variant.service";
+import PriceHistoryPopup from "@components/Popup/PriceHistoryPopup";
 
 const PopupProduct = ({ isOpen, onClose, product }) => {
   const [form] = Form.useForm();
@@ -44,6 +45,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
   const fileListIds = fileList.map((file) => file.uid);
 
   // State riêng để quản lý discount (tách riêng khỏi form)
+  const [isModalOpenPriceHistory, setIsModalOpenPriceHistory] = useState(false);
   const [discounts, setDiscounts] = useState([]);
   const [categoryIds, setCategoryIds] = useState([]);
   const [uploadedImageIds, setUploadedImageIds] = useState([]);
@@ -57,7 +59,7 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
         try {
           const response = await productService.getOneBySlugWithAllDiscounts(
             accessToken,
-            product.slug
+            product?.slug
           );
           setCurProduct(response?.metadata);
         } catch (error) {
@@ -67,6 +69,8 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     };
     fetchProductDiscounts();
   }, [product, accessToken]);
+
+  console.log("curProduct", curProduct);
 
   const cateIds = Array.isArray(curProduct?.categories)
     ? curProduct.categories.map((cate) => cate.categoryId) || []
@@ -92,14 +96,6 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     ? variantId.map((v) => v?.id) || []
     : [];
 
-  // console.log("variant", varId);
-  // console.log("hehe", variantId);
-
-  // console.log("imageIds", imageIds);
-  // console.log("Image", Image);
-  // console.log("fileListIds", fileListIds);
-  // console.log("fileList", fileList);
-
   // index of image that deleted
   const deletedImageIndex = Image.filter(
     (imageId) => !fileListIds.includes(imageId)
@@ -119,28 +115,16 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
     (discountId) => !discounts.map((d) => d.id).includes(discountId)
   );
 
-  // const toDeleteVariant = variantIds.filter(
-  //   (variantId) => !variantId.includes(variantId)
-  // );
-
-  // console.log("varId", varId);
-  // console.log("variantId", variantId);
-
-  // console.log("deletedImageIds", deletedImageIds);
-
-  // console.log("uploadedImageIds", uploadedImageIds);
-
-  // console.log("discountIds", discountIds);
-
-  // console.log("discounts", discounts);
-  // console.log("toDeleteDiscount", toDeleteDiscount);
-  // console.log("-------------------------------------------------");
-  // console.log("curProduct", curProduct);
-  //   console.log("cateIds", cateIds);
-  // console.log("categoryIds", categoryIds);
-  // console.log("product", product);
-
   const [isDescriptionModalOpen, setDescriptionModalOpen] = useState(false);
+
+  const variantsData = curProduct?.variants?.map((variant) => ({
+    ...variant,
+    priceHistory: variant.priceHistory.map((price) => ({
+      ...price,
+      startDate: price.startDate ? moment(price.startDate, "YYYY-MM-DD") : null,
+      endDate: price.endDate ? moment(price.endDate, "YYYY-MM-DD") : null,
+    })),
+  }));
 
   useEffect(() => {
     if (curProduct) {
@@ -701,8 +685,8 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
           </Form.List>
 
           {/* Nhóm 1: Thông tin chung */}
-          <div className="mb-4 p-4 border rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold mb-2">Thông tin chung</h3>
+          <div className="mb-3 p-3 border rounded-lg shadow-sm">
+            <h3 className="text-lg font-semibold mb-1">Thông tin chung</h3>
             <Row gutter={16}>
               <Col span={8}>
                 <Form.Item label="Danh mục" name="categoryIds">
@@ -729,8 +713,8 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
           </div>
 
           {/* Nhóm 2: Chất liệu & Hoàn thiện */}
-          <div className="mb-4 p-4 border rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold mb-2">
+          <div className="mb-2 p-3 border rounded-lg shadow-sm">
+            <h3 className="text-lg font-semibold mb-1">
               Chất liệu & Hoàn thiện
             </h3>
             <Row gutter={16}>
@@ -756,9 +740,18 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
           <Form.List name="variants">
             {(fields, { add, remove }) => (
               <>
-                <h3 className="text-lg font-semibold mb-2">
-                  Thông tin biến thể
-                </h3>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold mb-1">
+                    Thông tin biến thể
+                  </h3>
+                  <span
+                    className="text-red-500 text-sm flex items-center gap-1 cursor-pointer"
+                    onClick={() => setIsModalOpenPriceHistory(true)}
+                  >
+                    <BadgeAlert />
+                  </span>
+                </div>
+
                 {fields.map((field) => (
                   <Row gutter={16} key={field.key} align="middle">
                     <Col span={7}>
@@ -864,6 +857,11 @@ const PopupProduct = ({ isOpen, onClose, product }) => {
         </Form>
       </Modal>
 
+      <PriceHistoryPopup
+        isOpen={isModalOpenPriceHistory}
+        onClose={() => setIsModalOpenPriceHistory(false)}
+        variants={variantsData}
+      />
       {/* Modal chỉnh sửa mô tả */}
       <DescriptionPopup
         isOpen={isDescriptionModalOpen}
